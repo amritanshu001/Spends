@@ -8,7 +8,7 @@ from wtforms import StringField,PasswordField, EmailField, SelectField, Form, Fo
 from wtforms.validators import InputRequired, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
-from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount
+from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm
 
 app = Flask(__name__)
 
@@ -112,12 +112,14 @@ def upload():
 
 @app.route('/addbank', methods = ['GET','POST'])
 def addbank():
+    messages = {}
     cur_user = get_current_user()
     if not cur_user['uid']:
         return(redirect(url_for('login')))
+    form = BankForm()
     activepage = {}
     activepage['addbank'] = True
-    return render_template("register.html", activepage = activepage, cur_user = cur_user)
+    return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form)
 
 def validate_account(account_no):
     acc = Account.query.filter_by(account_no = account_no).first()
@@ -125,7 +127,6 @@ def validate_account(account_no):
         exists = True
         if acc.joint:
             joint = True
-            users = acc.users
         else:
             joint = False
     else:

@@ -1,0 +1,86 @@
+{% from "_navbar.html" import navbar %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Add Bank</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href={{ url_for('static', filename = "bootstrap.min.css") }} rel="stylesheet">
+    
+    <link href={{ url_for('static', filename = "theme.css") }} rel="stylesheet">
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{{ url_for('spendanalysis') }}">Bank Statement Analysis</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          {{ navbar(activepage, cur_user) }}
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+      <div class="page-header">
+        <h1>Add Bank</h1>
+      </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <h4 style="color:rgb(204, 201, 20); font: bold;">Bank Details</h4><br>
+              <form class="form-horizontal" method= "POST" action= {{ url_for('addbank') }} >
+                {{ form.csrf_token }}
+                <fieldset>               
+                  <div class="form-group">
+                    <div class="col-lg-2">
+                      {{ form.bank_name.label.text }}
+                    </div>
+                    <div class="col-lg-10">
+                      {{ form.bank_name(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      {{ form.start_row.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.start_row(class_= "form-control") }}
+                    </div>
+                    <div class="col-lg-3">
+                      {{ form.val_date_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.val_date_col(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-group">
+                    <div class="col-lg-10 col-lg">
+                      {{ form.add_bank(class_ = "btn btn-primary") }}
+                      <!--button type="submit" class="btn btn-primary">Add Accounts</button-->
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+            {% if messages.msg_stat %}
+            <div class="alert {{ delmessages.msg_stat }}">
+              <strong>{{ messages.shortmsg }}</strong> {{ messages.longmsg }}
+            </div>
+            {% endif %}
+          </div>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
