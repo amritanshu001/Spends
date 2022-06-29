@@ -45,10 +45,11 @@
                     <div class="col-lg-2">
                       {{ form.bank_name.label.text }}
                     </div>
-                    <div class="col-lg-10">
+                    <div class="col-lg-8">
                       {{ form.bank_name(class_= "form-control") }}
                     </div>
                   </div>
+                  <br>
                   <div class="row">
                     <div class="col-lg-3">
                       {{ form.start_row.label.text }}
@@ -64,6 +65,51 @@
                     </div>
                   </div>
                   <br>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      {{ form.txn_date_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.txn_date_col(class_= "form-control") }}
+                    </div>
+                    <div class="col-lg-3">
+                      {{ form.chq_no_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.chq_no_col(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      {{ form.txn_rmrk_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.txn_rmrk_col(class_= "form-control") }}
+                    </div>
+                    <div class="col-lg-3">
+                      {{ form.with_amt_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.with_amt_col(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <br>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      {{ form.crdt_amt_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.crdt_amt_col(class_= "form-control") }}
+                    </div>
+                    <div class="col-lg-3">
+                      {{ form.bal_col.label.text }}
+                    </div>
+                    <div class="col-lg-1">
+                      {{ form.bal_col(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <br>
                   <div class="form-group">
                     <div class="col-lg-10 col-lg">
                       {{ form.add_bank(class_ = "btn btn-primary") }}
@@ -74,7 +120,7 @@
               </form>
             </div>
             {% if messages.msg_stat %}
-            <div class="alert {{ delmessages.msg_stat }}">
+            <div class="alert {{ messages.msg_stat }}">
               <strong>{{ messages.shortmsg }}</strong> {{ messages.longmsg }}
             </div>
             {% endif %}

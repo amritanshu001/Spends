@@ -116,10 +116,25 @@ def addbank():
     cur_user = get_current_user()
     if not cur_user['uid']:
         return(redirect(url_for('login')))
+    bankform = BankData()
     form = BankForm()
+    if form.validate_on_submit():
+        bankdet = BankDetails()
+        form.populate_obj(bankdet)
+        db.session.add(bankdet)
+        try:
+            db.session.commit()
+        except BaseException as e:
+            messages['msg_stat'] = "alert-danger"
+            messages['shortmsg'] = "Error!"
+            messages['longmsg'] = "{}".format(e) 
+        else:
+            messages['msg_stat'] = "alert-success"
+            messages['shortmsg'] = "Success!"
+            messages['longmsg'] = "Bank {} added to the database".format(bankdet.bank_name)            
     activepage = {}
     activepage['addbank'] = True
-    return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form)
+    return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form, bankform = bankform)
 
 def validate_account(account_no):
     acc = Account.query.filter_by(account_no = account_no).first()

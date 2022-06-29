@@ -1,6 +1,7 @@
+from email import message
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, NumberRange
 from CreateTransactionModel import db, BankDetails
 
 class LoginForm(FlaskForm):
@@ -22,6 +23,7 @@ class BankData(Form):
         Length(max = 20)
     ])
     jointacc = BooleanField("Joint")
+    refresh = SubmitField("Refresh")
 
 class RegisterForm(FlaskForm):
     username = StringField("User Name", validators=[InputRequired(message = "User Name cannot be blank"),
@@ -44,12 +46,20 @@ class DelAccount(FlaskForm):
 
 class BankForm(FlaskForm):
     bank_name = StringField("Bank Name", validators=[InputRequired()])
-    start_row  = IntegerField("Starting from [row]",validators=[InputRequired()])
-    val_date_col = IntegerField("Value Date [col]",validators=[InputRequired()])
-    txn_date_col = IntegerField("Transaction Date [col]",validators=[InputRequired()])
-    chq_no_col = IntegerField("Cheque No. [col]",validators=[InputRequired()])
-    txn_rmrk_col = IntegerField("Remarks [col]",validators=[InputRequired()])
-    with_amt_col = IntegerField("Withdrawl Amount [col]",validators=[InputRequired()])
-    crdt_amt_col = IntegerField("Credit Amount [col]",validators=[InputRequired()])
-    bal_col = IntegerField("Balance [col]",validators=[InputRequired()])
+    start_row  = IntegerField("Starting from [row]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    val_date_col = IntegerField("Value Date [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    txn_date_col = IntegerField("Transaction Date [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    chq_no_col = IntegerField("Cheque No. [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    txn_rmrk_col = IntegerField("Remarks [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    with_amt_col = IntegerField("Withdrawl Amount [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    crdt_amt_col = IntegerField("Credit Amount [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
+    bal_col = IntegerField("Balance [col]",validators=[InputRequired(),
+    NumberRange(min = 1, message = "Cannot be less than 1")])
     add_bank = SubmitField("Add Bank")
