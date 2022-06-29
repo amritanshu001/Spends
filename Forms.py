@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField
+from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length
 from CreateTransactionModel import db, BankDetails
 
@@ -41,3 +41,15 @@ class AddAccount(FlaskForm):
 class DelAccount(FlaskForm):
     bank_det = FieldList(FormField(DelBankData), min_entries=0)
     del_acc = SubmitField("Delete Accounts") 
+
+class BankForm(FlaskForm):
+    bank_name = StringField("Bank Name", validators=[InputRequired()])
+    start_row  = IntegerField("Starting from [row]",validators=[InputRequired()])
+    val_date_col = IntegerField("Value Date [col]",validators=[InputRequired()])
+    txn_date_col = IntegerField("Transaction Date [col]",validators=[InputRequired()])
+    chq_no_col = IntegerField("Cheque No. [col]",validators=[InputRequired()])
+    txn_rmrk_col = IntegerField("Remarks [col]",validators=[InputRequired()])
+    with_amt_col = IntegerField("Withdrawl Amount [col]",validators=[InputRequired()])
+    crdt_amt_col = IntegerField("Credit Amount [col]",validators=[InputRequired()])
+    bal_col = IntegerField("Balance [col]",validators=[InputRequired()])
+    add_bank = SubmitField("Add Bank")

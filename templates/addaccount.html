@@ -78,11 +78,11 @@
                 <fieldset>               
                   {% for bank in form.banks %}
                   <div class="row">
-                    <div class="col-sm-2">{{ bank.bankname.label }}</div>
+                    <div class="col-sm-2">{{ bank.bankname.label.text }}</div>
                     <div class="col-sm-3">{{ bank.bankname(class_="form-control") }}</div>
-                    <div class="col-sm-2">{{ bank.accountno.label }}</div>
+                    <div class="col-sm-2">{{ bank.accountno.label.text }}</div>
                     <div class="col-sm-3">{{ bank.accountno(class_="form-control") }}</div> 
-                    <div class="col-sm-1">{{ bank.jointacc.label }}</div>
+                    <div class="col-sm-1">{{ bank.jointacc.label.text }}</div>
                     <div class="col-sm-1">{{ bank.jointacc }}</div>                     
                   </div>
                   <br>

@@ -16,6 +16,7 @@ class BankDetails(db.Model):
     __tablename__ = 'bank_details'
     bank_id = db.Column(db.Integer, nullable = False, primary_key = True, autoincrement = True)
     bank_name = db.Column(db.String(200), nullable = False, unique = True)
+    start_row = db.Column(db.Integer)
     val_date_col = db.Column(db.Integer)
     txn_date_col = db.Column(db.Integer)
     chq_no_col = db.Column(db.Integer)

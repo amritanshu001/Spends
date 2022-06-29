@@ -49,12 +49,16 @@ def login():
     if form.validate_on_submit():
         email = form.email.data.lower()
         user = AccountHolder.query.filter_by(email_id = email).first()
+        print(user)
         if user:
             if check_password_hash(user.password, form.password.data):
                 session['uid'] = user.user_id
                 session['admin'] = user.admin
                 session['name'] = user.user_name
-                return redirect(url_for('manageaccount'))
+                messages['msg_stat'] = "alert-success"
+                messages['shortmsg'] = "Success!"
+                messages['longmsg'] = "Login Successful"
+                return redirect(url_for('manageaccount', **messages))
             else:
                 messages['msg_stat'] = "alert-danger"
                 messages['shortmsg'] = "Failed!"
