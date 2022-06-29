@@ -54,7 +54,7 @@ def login():
                 session['uid'] = user.user_id
                 session['admin'] = user.admin
                 session['name'] = user.user_name
-                return redirect(url_for('spendanalysis'))
+                return redirect(url_for('manageaccount'))
             else:
                 messages['msg_stat'] = "alert-danger"
                 messages['shortmsg'] = "Failed!"
