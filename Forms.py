@@ -76,8 +76,4 @@ class Upload(FlaskForm):
     file = FileField("File Path", validators=[InputRequired()])
     upload = SubmitField("Upload Statement")
 
-    def validate_file(form, field):
-        if Path(field.data).suffix not in ['.xls', 'xlsx']:
-            raise ValidationError('Please upload Microsoft Excel File')
-
         

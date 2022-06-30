@@ -5,6 +5,7 @@ from CreateTransactionModel import db, BankDetails, Acc_Transaction, Account, Ac
 from databaseconnect import get_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
+from pathlib import Path
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload
 
 app = Flask(__name__)
@@ -110,6 +111,20 @@ def upload():
     user = AccountHolder.query.filter_by(user_id = cur_user['uid']).first()
     form = Upload()
     form.select_account.choices = [("0","---")] + [(i.account_id, i.account_no) for i in user.accounts]
+
+    if form.validate_on_submit():
+        if form.select_account.data == 0:
+            messages['msg_stat'] = "alert-danger"
+            messages['shortmsg'] = "Error!"
+            messages['longmsg'] = "Please select Account"
+        else:
+            if Path(form.file.data).suffix not in ['.xls','.xlsx']:
+                messages['msg_stat'] = "alert-danger"
+                messages['shortmsg'] = "Error!"
+                messages['longmsg'] = "Enter file in Microsoft Excel format"
+            else:
+                print(form.file.object_data)
+
    
     return render_template("upload.html", activepage = activepage, cur_user = cur_user, form = form, messages = messages)
 
