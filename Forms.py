@@ -1,8 +1,9 @@
 from email import message
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField
+from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, ValidationError
 from wtforms.validators import InputRequired, Length, NumberRange
 from CreateTransactionModel import db, BankDetails
+from pathlib import Path
 
 class LoginForm(FlaskForm):
     email = EmailField("Email Id", validators=[InputRequired(message = "Email cannot be blank"),
@@ -74,5 +75,9 @@ class Upload(FlaskForm):
     select_account = SelectField("Select Account", validators=[InputRequired()], coerce=int, choices=[])
     file = FileField("File Path", validators=[InputRequired()])
     upload = SubmitField("Upload Statement")
+
+    def validate_file(form, field):
+        if Path(field.data).suffix not in ['.xls', 'xlsx']:
+            raise ValidationError('Please upload Microsoft Excel File')
 
         
