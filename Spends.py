@@ -3,12 +3,9 @@ from flask_sqlalchemy import SQLAlchemy as sql
 from datetime import datetime
 from CreateTransactionModel import db, BankDetails, Acc_Transaction, Account, AccountHolder
 from databaseconnect import get_engine
-from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField
-from wtforms.validators import InputRequired, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
-from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList
+from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload
 
 app = Flask(__name__)
 
@@ -32,11 +29,12 @@ def get_current_user():
 
 @app.route('/spendanalysis', methods = ['GET','POST'])
 def spendanalysis():
+    activepage = {}
+    activepage['spend'] = True
     cur_user = get_current_user()
     if not cur_user['uid']:
         return(redirect(url_for('login')))
-    activepage = {}
-    activepage['spend'] = True
+
     return render_template("home.html", activepage = activepage, cur_user = cur_user)
 
 @app.route('/login', methods = ['GET','POST'])
@@ -107,8 +105,13 @@ def upload():
     if not cur_user['uid']:
         return(redirect(url_for('login')))
     activepage = {}
+    messages = {}
     activepage['upload'] = True
-    return render_template("register.html", activepage = activepage, cur_user = cur_user)
+    user = AccountHolder.query.filter_by(user_id = cur_user['uid']).first()
+    form = Upload()
+    form.select_account.choices = [("0","---")] + [(i.account_id, i.account_no) for i in user.accounts]
+   
+    return render_template("upload.html", activepage = activepage, cur_user = cur_user, form = form, messages = messages)
 
 @app.route('/addbank', methods = ['GET','POST'])
 def addbank():

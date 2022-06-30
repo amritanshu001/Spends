@@ -1,6 +1,6 @@
 from email import message
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField
+from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField
 from wtforms.validators import InputRequired, Length, NumberRange
 from CreateTransactionModel import db, BankDetails
 
@@ -69,3 +69,10 @@ class BankForm(FlaskForm):
 class BankList(FlaskForm):
     bankname = SelectField("Bank",coerce=int, choices=[("0","---")] + [(bank.bank_id, bank.bank_name) for bank in BankDetails.query.all()])
     refresh = SubmitField("Refresh")
+
+class Upload(FlaskForm):
+    select_account = SelectField("Select Account", validators=[InputRequired()], coerce=int, choices=[])
+    file = FileField("File Path", validators=[InputRequired()])
+    upload = SubmitField("Upload Statement")
+
+        
