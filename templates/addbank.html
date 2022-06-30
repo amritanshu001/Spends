@@ -36,6 +36,28 @@
       </div>
         <div class="row">
           <div class="col-lg-12">
+
+            <div class="well bs-component">
+              <h4 style="color:rgb(20, 204, 97); font: bold;">Select Bank</h4><br>
+              <form class="form-horizontal" method= "POST" action= {{ url_for('addbank') }} >
+                {{ bankform.csrf_token }}
+                <fieldset>               
+                  <div class="form-group">
+                    <div class="col-lg-2">
+                      {{ bankform.bankname.label.text }}
+                    </div>
+                    <div class="col-lg-8">
+                      {{ bankform.bankname(class_= "form-control") }}
+                    </div>
+                    <div class="col-lg-2">
+                      {{ bankform.refresh(class_ = "btn btn-primary") }}
+                      <!--button type="submit" class="btn btn-primary">Add Accounts</button-->
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+
             <div class="well bs-component">
               <h4 style="color:rgb(204, 201, 20); font: bold;">Bank Details</h4><br>
               <form class="form-horizontal" method= "POST" action= {{ url_for('addbank') }} >

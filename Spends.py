@@ -8,7 +8,7 @@ from wtforms import StringField,PasswordField, EmailField, SelectField, Form, Fo
 from wtforms.validators import InputRequired, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
-from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm
+from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList
 
 app = Flask(__name__)
 
@@ -113,12 +113,21 @@ def upload():
 @app.route('/addbank', methods = ['GET','POST'])
 def addbank():
     messages = {}
+    activepage = {}
     cur_user = get_current_user()
     if not cur_user['uid']:
         return(redirect(url_for('login')))
-    bankform = BankData()
+    activepage['addbank'] = True
     form = BankForm()
-    if form.validate_on_submit():
+    bankform = BankList()
+
+    if bankform.validate_on_submit() and bankform.refresh.data and bankform.bankname.data != 0:
+        print(bankform.bankname.data)
+        bank = BankDetails.query.filter_by(bank_id = bankform.bankname.data).first()
+        if bank:
+            form = BankForm(obj = bank)
+
+    if form.validate_on_submit() and form.add_bank.data:
         bankdet = BankDetails()
         form.populate_obj(bankdet)
         db.session.add(bankdet)
@@ -132,9 +141,7 @@ def addbank():
             messages['msg_stat'] = "alert-success"
             messages['shortmsg'] = "Success!"
             messages['longmsg'] = "Bank {} added to the database".format(bankdet.bank_name)            
-    activepage = {}
-    activepage['addbank'] = True
-    return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form, bankform = bankform)
+    return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form,bankform = bankform)
 
 def validate_account(account_no):
     acc = Account.query.filter_by(account_no = account_no).first()
@@ -162,7 +169,6 @@ def manageaccount():
     form = AddAccount()
     acc_hldr = AccountHolder.query.filter_by(user_id = cur_user['uid']).first()
     delform = DelAccount()
-    print ("Before processing: {}".format(delform))
     if acc_hldr:
         for account in acc_hldr.accounts:
             if account.active:
@@ -172,7 +178,6 @@ def manageaccount():
                 delbnk.bankname = banknm.bank_name   
                 delbnk.deactivate = False
                 delform.bank_det.append_entry(delbnk)
-    print ("After Processing: {}".format(delform))
 
     if delform.del_acc.data and delform.validate_on_submit():
         print(delform.del_acc)

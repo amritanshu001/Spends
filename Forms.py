@@ -25,6 +25,7 @@ class BankData(Form):
     jointacc = BooleanField("Joint")
     refresh = SubmitField("Refresh")
 
+
 class RegisterForm(FlaskForm):
     username = StringField("User Name", validators=[InputRequired(message = "User Name cannot be blank"),
             Length(min = 8, max= 200)
@@ -45,6 +46,7 @@ class DelAccount(FlaskForm):
     del_acc = SubmitField("Delete Accounts") 
 
 class BankForm(FlaskForm):
+
     bank_name = StringField("Bank Name", validators=[InputRequired()])
     start_row  = IntegerField("Starting from [row]",validators=[InputRequired(),
     NumberRange(min = 1, message = "Cannot be less than 1")])
@@ -63,3 +65,7 @@ class BankForm(FlaskForm):
     bal_col = IntegerField("Balance [col]",validators=[InputRequired(),
     NumberRange(min = 1, message = "Cannot be less than 1")])
     add_bank = SubmitField("Add Bank")
+
+class BankList(FlaskForm):
+    bankname = SelectField("Bank",coerce=int, choices=[("0","---")] + [(bank.bank_id, bank.bank_name) for bank in BankDetails.query.all()])
+    refresh = SubmitField("Refresh")
