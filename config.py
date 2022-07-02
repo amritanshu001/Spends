@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 
-def config(filename = r"D:\amritanshu\OneDrive - Infosys Limited\VB code\Python Code\connect.ini", section = 'postgresql'):
+def config(filename = 'connect.ini', section = 'postgresql'):
     parser = ConfigParser()
     parser.read(filename)
 
