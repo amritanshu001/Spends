@@ -23,7 +23,6 @@ def processfile(path, bankid):
     for sht in wb.Sheets:
         lastrow = sht.Cells(bank_dets.start_row,bank_dets.val_date_col).End(4)
         sht_last_row[sht.Name] = lastrow.Row
-        total_rows += lastrow.Row - 13
     wb.Close()
         
     extract_cols = [bank_dets.val_date_col-1, bank_dets.txn_date_col-1,
@@ -38,7 +37,7 @@ def processfile(path, bankid):
     sheets = pd.ExcelFile(path)
     for sheet in sheets.sheet_names:
         no_rows = sht_last_row[sheet] - bank_dets.start_row
-        df = pd.read_excel(path,sheet_name=sheet,usecols=extract_cols, skiprows=bank_dets.start_row-1, names=col_names, nrows=no_rows)
+        df = pd.read_excel(path, sheet_name=sheet, usecols=extract_cols, skiprows=bank_dets.start_row-1, names=col_names, nrows=no_rows)
         final_df = final_df.append(df)
 
     return(final_df)
