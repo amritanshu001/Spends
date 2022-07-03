@@ -29,16 +29,19 @@ class BankDetails(db.Model):
     with_amt_col = db.Column(db.Integer)
     crdt_amt_col = db.Column(db.Integer)
     bal_col = db.Column(db.Integer)
+    date_id = db.Column(db.Integer, db.ForeignKey('dateformat.date_id'))
+    
     # one to many relationship
     accounts = db.relationship('Account',backref = 'bank_details')
 
     def __repr__(self):
         return f'<Bank {self.bank_name}>'
 
-#bank_users = db.Table('bank_users',
-#                db.Column('bank_id', db.Integer, db.ForeignKey('bank_details.bank_id'), primary_key = True),
-#                db.Column('user_id', db.Integer, db.ForeignKey('accountholder.user_id'), primary_key = True)
-#            )
+class DateFormat(db.Model):
+    __tablename__ = 'dateformat'
+    date_id = db.Column(db.Integer, nullable = False, primary_key = True, autoincrement = True)
+    date_format = db.Column(db.String(20),nullable = False, unique = True)
+    py_date = db.Column(db.String(20), nullable = False)
 
 account_users = db.Table('account_users',
                 db.Column('user_id', db.Integer, db.ForeignKey('accountholder.user_id'), primary_key = True),
