@@ -93,6 +93,8 @@ class Acc_Transaction(db.Model):
     balance = db.Column(db.Float, nullable = False)
     #Foreign Key for 1:n relation
     acc_id  = db.Column(db.Integer, db.ForeignKey('account.account_id'), nullable = False)
+    __table_args__ = (db.UniqueConstraint('value_date', 'txn_date', 'txn_remarks', 'withdrawal_amt', 'deposit_amt', 'balance','cheque_no',  name='unique_txn'),
+                     )
 
     def __repr__(self):
         return f'<Transaction {self.txn_id}>'
