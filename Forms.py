@@ -2,7 +2,7 @@ from email import message
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, ValidationError
 from wtforms.validators import InputRequired, Length, NumberRange
-from CreateTransactionModel import db, BankDetails
+from CreateTransactionModel import db, BankDetails, DateFormat
 from pathlib import Path
 
 class LoginForm(FlaskForm):
@@ -65,6 +65,7 @@ class BankForm(FlaskForm):
     NumberRange(min = 1, message = "Cannot be less than 1")])
     bal_col = IntegerField("Balance [col]",validators=[InputRequired(),
     NumberRange(min = 1, message = "Cannot be less than 1")])
+    date_id = SelectField("Date Format",coerce = int, validators=[InputRequired()], choices=[('0','---')]+[(format.date_id, format.date_format) for format in DateFormat.query.all()])
     add_bank = SubmitField("Add Bank")
 
 class BankList(FlaskForm):

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, g, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy as sql
 from datetime import datetime
-from CreateTransactionModel import db, BankDetails, Acc_Transaction, Account, AccountHolder
+from CreateTransactionModel import db, BankDetails, Acc_Transaction, Account, AccountHolder, DateFormat
 from databaseconnect import get_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
@@ -138,18 +138,23 @@ def addbank():
         return(redirect(url_for('login')))
     activepage['addbank'] = True
     form = BankForm()
+    #form.date_format.choices = [('0','---')]+[(format.date_id, format.date_format) for format in DateFormat.query.all()]
     bankform = BankList()
 
     if bankform.validate_on_submit() and bankform.refresh.data and bankform.bankname.data != 0:
-        print(bankform.bankname.data)
         bank = BankDetails.query.filter_by(bank_id = bankform.bankname.data).first()
         if bank:
             form = BankForm(obj = bank)
 
-    if form.validate_on_submit() and form.add_bank.data:
-        bankdet = BankDetails()
-        form.populate_obj(bankdet)
-        db.session.add(bankdet)
+    if form.validate_on_submit() and form.add_bank.data:        
+        bank_exists = BankDetails.query.filter_by(bank_name = form.bank_name.data).first()
+        if bank_exists:
+            form.populate_obj(bank_exists)
+            db.session.add(bank_exists)
+        else:
+            bankdet = BankDetails()
+            form.populate_obj(bankdet)
+            db.session.add(bankdet)
         try:
             db.session.commit()
         except BaseException as e:
@@ -159,7 +164,10 @@ def addbank():
         else:
             messages['msg_stat'] = "alert-success"
             messages['shortmsg'] = "Success!"
-            messages['longmsg'] = "Bank {} added to the database".format(bankdet.bank_name)            
+            if bank_exists:
+                messages['longmsg'] = "Bank {} modified in the database".format(bank_exists.bank_name)
+            else:
+                messages['longmsg'] = "Bank {} added to the database".format(bankdet.bank_name)            
     return render_template("addbank.html", activepage = activepage, cur_user = cur_user, messages = messages, form = form,bankform = bankform)
 
 def validate_account(account_no):
