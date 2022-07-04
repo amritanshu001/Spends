@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = get_engine()[0]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = sql()
+db = sql(app)
 migrate = Migrate()
 
 db.init_app(app)
@@ -41,6 +41,7 @@ class DateFormat(db.Model):
     __tablename__ = 'dateformat'
     date_id = db.Column(db.Integer, nullable = False, primary_key = True, autoincrement = True)
     date_format = db.Column(db.String(20),nullable = False, unique = True)
+    desc = db.Column(db.String(200),nullable = False)
     py_date = db.Column(db.String(20), nullable = False)
 
 account_users = db.Table('account_users',
