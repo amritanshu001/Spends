@@ -6,15 +6,27 @@ from databaseconnect import get_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 from pathlib import Path
+import os
+import pandas as pd
+from sqlalchemy.exc import IntegrityError
 from processfile import processfile
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload
+from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllowed
+
 
 app = Flask(__name__)
+
+docs = UploadSet('statement',DOCUMENTS)
 
 app.config["DEBUG"] = True
 app.config["SECRET_KEY"] = "Secret"
 app.config['SQLALCHEMY_DATABASE_URI'] = get_engine()[0]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOADED_STATEMENT_DEST'] = os.path.join(os.path.dirname(os.path.realpath(__file__)),'temp')
+app.config['UPLOADED_STATEMENT_ALLOW'] = ['xls', 'xlsx']
+
+configure_uploads(app,docs)
+
 db.init_app(app)
 
 
@@ -119,14 +131,33 @@ def upload():
             messages['shortmsg'] = "Error!"
             messages['longmsg'] = "Please select Account"
         else:
-            if Path(form.file.data).suffix not in ['.xls','.xlsx']:
+            try:
+                statement_file = docs.save(form.file.data)
+            except UploadNotAllowed:
                 messages['msg_stat'] = "alert-danger"
                 messages['shortmsg'] = "Error!"
                 messages['longmsg'] = "Enter file in Microsoft Excel format"
             else:
-                print(form.file.object_data)
-
-   
+                selected_acc = Account.query.filter_by(account_id = form.select_account.data).first()
+                df = processfile(docs.path(statement_file), selected_acc.bank)
+                insert_suc = 0; insert_fail = 0
+                for indx, transaction in df.iterrows():
+                    acc_txn = Acc_Transaction(**dict(transaction))
+                    acc_txn.acc_id = form.select_account.data
+                    db.session.add(acc_txn)
+                    try:
+                        db.session.commit()
+                    except IntegrityError as e:
+                        db.session.rollback()
+                        insert_fail += 1
+                        print("Transaction {} already exists. Skipping...".format(transaction['txn_remarks']))
+                    else:
+                        insert_suc += 1
+                messages['msg_stat'] = "alert-info"
+                messages['shortmsg'] = "Database Update Status: "
+                messages['longmsg'] = "{} records successfully inserted. {} Records failed".format(insert_suc,insert_fail)
+                os.remove(docs.path(statement_file))
+                
     return render_template("upload.html", activepage = activepage, cur_user = cur_user, form = form, messages = messages)
 
 @app.route('/addbank', methods = ['GET','POST'])
