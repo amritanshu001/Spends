@@ -88,19 +88,25 @@ def spendanalysis():
                 else:
                     form.balance.data = form.opening_bal.data - form.closing_bal.data
 
+                sums = 0.00
                 for ser, txn in enumerate(top5cr,1):
                     txn5 = Top5()
                     txn5.txn_no = ser
                     txn5.txn_date = txn.txn_date
                     txn5.txn_amt = txn.deposit_amt
+                    sums += txn.deposit_amt
                     form.top_5_credit.append_entry(txn5)
+                form.top5_share_credit.data = (sums/credit_summary[0][0])*100
 
+                sums=0.00
                 for ser, txn in enumerate(top5dr,1):
                     txn5 = Top5()
                     txn5.txn_no = ser
                     txn5.txn_date = txn.txn_date
                     txn5.txn_amt = txn.withdrawal_amt
+                    sums += txn.withdrawal_amt
                     form.top_5_debit.append_entry(txn5)
+                form.top5_share_debit.data = (sums/debit_summary[0][0])*100
             else:
                 messages['msg_stat'] = "alert-info"
                 messages['shortmsg'] = "Information!"

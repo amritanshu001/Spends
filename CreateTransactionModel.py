@@ -44,6 +44,9 @@ class DateFormat(db.Model):
     desc = db.Column(db.String(200),nullable = False)
     py_date = db.Column(db.String(20), nullable = False)
 
+    def __repr__(self):
+        return f'<Date Format {self.date_format}'
+
 account_users = db.Table('account_users',
                 db.Column('user_id', db.Integer, db.ForeignKey('accountholder.user_id'), primary_key = True),
                 db.Column('account_id', db.Integer, db.ForeignKey('account.account_id'), primary_key = True)
@@ -59,7 +62,6 @@ class AccountHolder(db.Model):
     admin = db.Column(db.Boolean, default = False)
     #m:n relationships
     accounts = db.relationship('Account', secondary = account_users, back_populates = "users")
-    #banks = db.relationship('BankDetails', secondary = bank_users)
 
 
     def __repr__(self):
