@@ -1,9 +1,10 @@
-from email import message
+
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, ValidationError
+from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, DecimalField, ValidationError
 from wtforms.validators import InputRequired, Length, NumberRange
 from CreateTransactionModel import db, BankDetails, DateFormat
 from pathlib import Path
+from wtforms.fields import DateField
 
 class LoginForm(FlaskForm):
     email = EmailField("Email Id", validators=[InputRequired(message = "Email cannot be blank"),
@@ -77,4 +78,31 @@ class Upload(FlaskForm):
     file = FileField("File Path", validators=[InputRequired()])
     upload = SubmitField("Upload Statement")
 
-        
+class Top5(Form):
+    txn_no = IntegerField("Transaction Number", validators=[NumberRange(min=1)], render_kw = {'readonly':True})
+    txn_date = DateField("Transaction Date", render_kw = {'readonly':True})#,format='%d-%b-%Y')
+    txn_amt = DecimalField("Transaction Amount", render_kw = {'readonly':True})
+
+class SpendsAnalysis(FlaskForm):
+    select_account = SelectField("Select Account", validators=[InputRequired()], coerce=int, choices=[])
+    frm_date = DateField("From Date", validators=[InputRequired()])
+    to_date = DateField("To Date",validators=[InputRequired()])
+    opening_bal = DecimalField(label="Opening Balance", render_kw = {'readonly':True})
+    outgoing = DecimalField("Outgoing", render_kw = {'readonly':True})
+    incoming = DecimalField("Incoming", render_kw = {'readonly':True})
+    incoming_txn = IntegerField(render_kw = {'readonly':True})
+    outgoing_txn = IntegerField(render_kw = {'readonly':True})
+    incoming_avg = DecimalField( render_kw = {'readonly':True})
+    outgoing_avg = DecimalField( render_kw = {'readonly':True})
+    balance = DecimalField( render_kw = {'readonly':True})
+    closing_bal = DecimalField(label="Closing Balance", render_kw = {'readonly':True})
+    top_5_credit = FieldList(FormField(Top5), max_entries=5, render_kw = {'readonly':True})
+    top_5_debit = FieldList(FormField(Top5), max_entries=5, render_kw = {'readonly':True})
+    top5_share_credit = DecimalField("Top 5 Share", render_kw = {'readonly':True})
+    top5_share_debit = DecimalField("Top 5 Share", render_kw = {'readonly':True})
+    spend = SubmitField("Spend Analysis")
+
+
+
+
+

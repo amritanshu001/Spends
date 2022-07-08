@@ -1,0 +1,198 @@
+{% from "_navbar.html" import navbar %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Spend Analysis</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href={{ url_for('static', filename = "bootstrap.min.css") }} rel="stylesheet">
+    
+    <link href={{ url_for('static', filename = "theme.css") }} rel="stylesheet">
+
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      td, th {
+        border: 5px solid #ca1212;
+        text-align: left;
+        padding: 10px;
+      }
+      
+      /*tr:nth-child(even) {
+        background-color: #dddddd;
+      }*/
+      </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{{ url_for('spendanalysis') }}">Bank Statement Analysis</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          {{ navbar(activepage, cur_user) }}
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+      <div class="page-header">
+        <h1>Spend Analysis</h1>
+      </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <form class="form-horizontal" method= "POST" action= {{ url_for('spendanalysis') }} >
+                {{form.csrf_token}} 
+                <fieldset>
+                  <div class="form-group">
+                    <div class="col-lg-2 control-label">
+                      {{ form.select_account.label.text }}
+                    </div>
+                    <div class="col-lg-10">
+                      {{ form.select_account(class_= "form-control") }}
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-2 control-label">
+                      {{ form.frm_date.label.text }}
+                    </div>
+                    <div class="col-lg-4">
+                      {{ form.frm_date(class_="form-control") }}
+                    </div>
+                    <div class="col-lg-2 control-label">
+                      {{ form.to_date.label.text }}
+                    </div>
+                    <div class="col-lg-4">
+                      {{ form.to_date(class_="form-control") }}
+                    </div>
+                  </div>                  
+                  <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                      {{ form.spend(class_ = "btn btn-primary") }}
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% if messages.msg_stat %}
+        <div class="alert {{ messages.msg_stat }}">
+          <strong>{{ messages.shortmsg }}</strong> {{ messages.longmsg }}
+        </div>
+        {% endif %}
+        {% if display %}
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <div class="row">
+                <div class="col-lg-2 control-label" style="text-align: center;">
+                  Opening Balance
+                </div>
+                <div class="col-lg-2">
+                  {{ form.opening_bal(class_="form-control") }}
+                </div>
+                <div class="col-lg-2 control-label" style="text-align: center;">
+                  {{ form.closing_bal.label.text }}
+                </div>
+                <div class="col-lg-2">
+                  {{ form.closing_bal(class_="form-control") }}
+                </div>
+                <div class="col-lg-2 control-label" style="text-align: center;">
+                  Surplus
+                </div>
+                <div class="col-lg-2">
+                  {{ form.balance(class_="form-control") }}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <table style="width:100%">
+                <tr style="background-color: #8387c5;">
+                  <th></th>
+                  <th style="font: bold; text-align: left;color: #043515;">Amount</th>
+                  <th style="font: bold; text-align: left;color: #043515;">No. of Transaction</th>
+                  <th style="font: bold; text-align: left;color: #043515;">Avg per Transaction</th>
+                </tr>
+                <tr style="background-color: #8387c5;">
+                  <td style="font: bold; color: rgb(11, 129, 37); text-align: center; font-size: large;" class="control-label">{{ form.incoming.label }}</td>
+                  <td>{{ form.incoming(class_="form-control") }}</td>
+                  <td>{{ form.incoming_txn(class_="form-control") }}</td>
+                  <td>{{ form.incoming_avg(class_="form-control") }}</td>
+                </tr>
+                <tr style="background-color: #8387c5;">
+                  <td style="font: bold; color: rgb(136, 55, 41); text-align: center; font-size: large;" class="control-label">{{ form.outgoing.label }}</td>
+                  <td>{{ form.outgoing(class_="form-control") }}</td>
+                  <td>{{ form.outgoing_txn(class_="form-control") }}</td>
+                  <td>{{ form.outgoing_avg(class_="form-control") }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="well bs-component" style="background-color:#a99cbb ;">
+              <table style="width:100%" >
+                <caption style="color: #0b741c;text-align: center; font:bold caption; font-size:medium; ">Top 5 Credit Txns</caption>
+                <tr>
+                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">S. No</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Txn Date</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Amount</th>
+                </tr> 
+                {% for txn in form.top_5_credit %}
+                <tr>
+                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_no(class_="form-control") }}</th>
+                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_date(class_="form-control") }}</th>
+                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_amt(class_="form-control") }}</th>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-6" >
+            <div class="well bs-component" style="background-color:#a99cbb ;">
+              <table style="width:100%" >
+                <caption style="color: #a81010;text-align: center; font:bold caption; font-size:medium;">Top 5 Debit Txns</caption>
+                <tr>
+                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;" class="control-label">S. No</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Txn Date</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Amount</th>
+                </tr> 
+                {% for txn in form.top_5_debit %}
+                <tr>
+                  <td style = "width:15%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_no(class_="form-control") }}</th>
+                  <td style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_date(class_="form-control") }}</th>
+                  <td style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_amt(class_="form-control") }}</th>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+    </div> <!-- /container -->
+  </body>
+</html>

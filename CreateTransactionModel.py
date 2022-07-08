@@ -97,7 +97,7 @@ class Acc_Transaction(db.Model):
                      )
 
     def __repr__(self):
-        return f'<Transaction {self.txn_id}>'
+        return f'<{self.txn_id}:{self.txn_date} - {self.txn_remarks}>'
 
 
 
