@@ -7,7 +7,7 @@ cur_path = os.path.dirname(os.path.realpath(__file__))
 
 os.chdir(cur_path)
 
-df = pd.read_excel('Dateformats.xlsx')
+df = pd.read_excel('Dateformats.xlsx', engine='openpyxl')
 
 for indx, format in df.iterrows():
     db.session.add(DateFormat(**dict(format)))
