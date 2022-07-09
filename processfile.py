@@ -28,7 +28,7 @@ def processfile(path, bankid):
                     'withdrawal_amt', 'deposit_amt',
                     'balance']
     final_df = pd.DataFrame(columns=col_names)
-    sheets = pd.ExcelFile(path)
+    sheets = pd.ExcelFile(path, engine='openpyxl')
     for sheet in sheets.sheet_names:
         no_rows = sht_last_row[sheet] - bank_dets.start_row
         df = pd.read_excel(path, sheet_name=sheet, usecols=extract_cols, skiprows=bank_dets.start_row-1, names=col_names, nrows=no_rows)

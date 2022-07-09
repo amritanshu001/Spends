@@ -241,6 +241,7 @@ def addbank():
     form = BankForm()
     #form.date_format.choices = [('0','---')]+[(format.date_id, format.date_format) for format in DateFormat.query.all()]
     bankform = BankList()
+    bankform.bankname.choices = [("0","---")] + [(bank.bank_id, bank.bank_name) for bank in BankDetails.query.all()]
 
     if bankform.validate_on_submit() and bankform.refresh.data and bankform.bankname.data != 0:
         bank = BankDetails.query.filter_by(bank_id = bankform.bankname.data).first()
@@ -295,6 +296,7 @@ def manageaccount():
     activepage = {}
     activepage['addaccount'] = True   
     form = AddAccount()
+    
     acc_hldr = AccountHolder.query.filter_by(user_id = cur_user['uid']).first()
     delform = DelAccount()
     if acc_hldr:
@@ -380,7 +382,7 @@ def manageaccount():
                         else:
                             messages['msg_stat'] = "alert-success"
                             messages['shortmsg'] = "Success!"
-                            messages['longmsg'] = "Accounts Added to user id {}".format(cur_user['uid'])        
+                            messages['longmsg'] = "Accounts Added to user {}".format(cur_user['name'])        
                 else:
                     messages['msg_stat'] = "alert-danger"
                     messages['shortmsg'] = "Error!"

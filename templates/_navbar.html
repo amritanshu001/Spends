@@ -15,7 +15,7 @@
     <li {% if activepage.addbank %}class="active" {% endif %}><a href="{{ url_for('addbank') }}">Add Bank Details</a></li>
     {% endif %}
     {% if cur_user.uid %}
-    <li><a href="{{ url_for('logout') }}">Logout {{ cur_user.user_name | title }}</a></li>
+    <li><a href="{{ url_for('logout') }}">Logout {{ cur_user.name | title }}</a></li>
     {% endif %}
 </ul>
 {% endmacro %}
