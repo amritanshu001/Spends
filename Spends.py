@@ -40,6 +40,15 @@ def get_current_user():
         user_dict['name'] = session['name']
     return user_dict
 
+@app.route('/')
+def index():
+    activepage = {}
+    activepage['home'] = True
+    cur_user = get_current_user()
+
+    return render_template('home.html', activepage = activepage, cur_user = cur_user)
+    
+
 @app.route('/spendanalysis', methods = ['GET','POST'])
 def spendanalysis():
     activepage = {}
@@ -85,8 +94,10 @@ def spendanalysis():
 
                 if form.closing_bal.data >= form.opening_bal.data:
                     form.balance.data = form.closing_bal.data - form.opening_bal.data
+                    form.balance(style = "font:bold; color:rgb(11, 129, 37)")
                 else:
                     form.balance.data = form.opening_bal.data - form.closing_bal.data
+                    form.balance(style = "font:bold; color:#a81010")
 
                 sums = 0.00
                 for ser, txn in enumerate(top5cr,1):
@@ -400,7 +411,7 @@ def logout():
     session.pop('uid', None)
     session.pop('admin', None)
     session.pop('name', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
     
 
 if __name__ == '__main__':

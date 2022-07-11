@@ -1,0 +1,70 @@
+{% from "_navbar.html" import navbar %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Home</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href={{ url_for('static', filename = "bootstrap.min.css") }} rel="stylesheet">
+    
+    <link href={{ url_for('static', filename = "theme.css") }} rel="stylesheet">
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{{ url_for('spendanalysis') }}">Bank Statement Analysis</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          {{ navbar(activepage, cur_user) }}
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+      <div class="page-header">
+        <h1>Introduction</h1>
+      </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <caption style="font-size: 50px;">
+                This application is developed to create spend analysis of the bank statements uploaded by the users :
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Register</span>- User can register themselves on the site and set their password.
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Login</span>- User can login into the system with the registered credentials.
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Manage Bank Accounts</span>- User can add / removed their bank accounts in the database.
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Upload Statement</span>- Users can select their bank account and upload their statements in excel format into the system.
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Spend Analysis</span>- Users can do the spend analysis on the uploaded statement for a specific account and a date period. 
+                <br>
+                <br>
+                <span style="font:bold; font-size: large;color: rgb(0, 174, 255);">Add Bank Details (Admin Only)</span>- Admin users can maintain the Bank names and the format of excel statement to assist the system in uploading the data into the system. 
+              </caption>
+            </div>
+
+          </div>
+        </div>
+      </div>  
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

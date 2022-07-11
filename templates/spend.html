@@ -104,7 +104,7 @@
                   {{ form.opening_bal.label.text }}
                 </div>
                 <div class="col-lg-2">
-                  {{ form.opening_bal(class_="form-control") }}
+                  {{ form.opening_bal(class_="form-control", style= "text-align:center") }}
                 </div>
                 <div class="col-lg-2 control-label" style="text-align: center;">
                   {{ form.closing_bal.label.text }}
@@ -113,10 +113,18 @@
                   {{ form.closing_bal(class_="form-control") }}
                 </div>
                 <div class="col-lg-2 control-label" style="text-align: center; ">
-                  Surplus
+                  {% if (form.closing_bal.data >= form.opening_bal.data) %}
+                    <span style="font: bold; color: #0b741c;">Surplus</span>
+                  {% else %}
+                    <span style="font: bold; color: #a81010;">Deficit</span>
+                  {% endif %}
                 </div>
                 <div class="col-lg-2">
-                  {{ form.balance(class_="form-control") }}
+                  {% if (form.closing_bal.data > form.opening_bal.data) %}
+                    {{ form.balance(class_="form-control", style= "font:bold; color:#0b741c") }}
+                  {% else %}
+                    {{ form.balance(class_="form-control", style= "font:bold; color:#a81010") }}
+                  {% endif %}
                 </div>
               </div>
 

@@ -4,6 +4,7 @@
     <li {% if activepage.spend %}class="active" {% endif %}><a href="{{ url_for('spendanalysis') }}">Spend Analysis</a></li>
     {% endif %}
     {% if not cur_user.uid %}
+    <li {% if activepage.home %}class="active" {% endif %}><a href="{{ url_for('index') }}">Home</a></li>
     <li {% if activepage.login %}class="active" {% endif %}><a href="{{ url_for('login') }}">Login</a></li>
     <li {% if activepage.register %}class="active" {% endif %}><a href="{{ url_for('register') }}">Register</a></li>
     {% endif %}
