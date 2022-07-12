@@ -1,23 +1,31 @@
 import pandas as pd
 from CreateTransactionModel import Account, BankDetails, Acc_Transaction, AccountHolder, DateFormat
 import os
-import win32com.client as win32
-import pythoncom
+import xlrd
+import openpyxl as xl
+#import win32com.client as win32
+#import pythoncom
 
 def processfile(path, bankid):
-    pythoncom.CoInitialize()
-    excel = win32.gencache.EnsureDispatch('Excel.Application')
-    excel.Visible = False
-    wb = excel.Workbooks.Open(path)
+    #pythoncom.CoInitialize()
+    #excel = win32.gencache.EnsureDispatch('Excel.Application')
+    #excel.Visible = False
 
     bank_dets = BankDetails.query.filter_by(bank_id = bankid).first()
-
     sht_last_row = {}
-    total_rows = 0
-    for sht in wb.Sheets:
-        lastrow = sht.Cells(bank_dets.start_row,bank_dets.val_date_col).End(4)
-        sht_last_row[sht.Name] = lastrow.Row
-    wb.Close()
+
+    wb = xl.load_workbook(path, read_only=True)
+    for sheet in wb:
+        f=0
+        for row in sheet.iter_rows(min_row = bank_dets.start_row+1, min_col = bank_dets.val_date_col, max_col = bank_dets.val_date_col):
+            for cell in row:
+                if cell.value == None or cell.value == "":
+                    sht_last_row[sheet.title] = cell.row-1
+                    f=1
+                    break
+            if f == 1:
+                break
+    wb.close()
         
     extract_cols = [bank_dets.val_date_col-1, bank_dets.txn_date_col-1,
                     bank_dets.chq_no_col-1, bank_dets.txn_rmrk_col-1,
