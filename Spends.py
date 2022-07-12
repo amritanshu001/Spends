@@ -19,7 +19,7 @@ app = Flask(__name__)
 docs = UploadSet('statement',DOCUMENTS)
 
 if platform.system() == 'Linux':
-    app.config["DEBUG"] = False
+    app.config["DEBUG"] = True
 else:
     app.config["DEBUG"] = True
 app.config["SECRET_KEY"] = "Secret"
