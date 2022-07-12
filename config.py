@@ -1,6 +1,11 @@
 from configparser import ConfigParser
+import os
 
 def config(filename = 'connect.ini', section = 'postgresql'):
+
+    cur_path = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(cur_path)
+    
     parser = ConfigParser()
     parser.read(filename)
 

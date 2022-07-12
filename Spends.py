@@ -11,13 +11,17 @@ from sqlalchemy.exc import IntegrityError
 from processfile import processfile
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload, SpendsAnalysis, Top5
 from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllowed
+import platform
 
 
 app = Flask(__name__)
 
 docs = UploadSet('statement',DOCUMENTS)
 
-app.config["DEBUG"] = True
+if platform.system() == 'Linux':
+    app.config["DEBUG"] = False
+else:
+    app.config["DEBUG"] = True
 app.config["SECRET_KEY"] = "Secret"
 app.config['SQLALCHEMY_DATABASE_URI'] = get_engine()[0]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

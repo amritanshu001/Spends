@@ -8,7 +8,7 @@ def get_engine():
     if platform.system() == 'Linux':
         database = config(filename='linux_connect.ini')
     else:
-        database = config()
+        database = config(filename='connect.ini')
 
     dialect = 'postgresql'
     driver = 'psycopg2'
@@ -19,6 +19,7 @@ def get_engine():
     db = database['database']
 
     url = f"{dialect}+{driver}://{user}:{passwd}@{host}:{port}/{db}"
+    print(url)
     #if not database_exists(url):
     #    create_database(url)
     engine = create_engine(url, pool_size=50, echo=False)
