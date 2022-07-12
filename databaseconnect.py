@@ -19,7 +19,6 @@ def get_engine():
     db = database['database']
 
     url = f"{dialect}+{driver}://{user}:{passwd}@{host}:{port}/{db}"
-    print(url)
     #if not database_exists(url):
     #    create_database(url)
     engine = create_engine(url, pool_size=50, echo=False)
