@@ -1,0 +1,1 @@
+web: gunicorn Spends:app
