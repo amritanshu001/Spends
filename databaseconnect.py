@@ -2,9 +2,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 from config import config
+import platform
 
 def get_engine():
-    database = config()
+    if platform.system() == 'Linux':
+        database = config(filename='linux_connect.ini')
+    else:
+        database = config()
+
     dialect = 'postgresql'
     driver = 'psycopg2'
     port = '5432'
