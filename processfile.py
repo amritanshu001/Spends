@@ -40,7 +40,7 @@ def processfile(path, bankid):
     for sheet in sheets.sheet_names:
         no_rows = sht_last_row[sheet] - bank_dets.start_row
         df = pd.read_excel(path, sheet_name=sheet, usecols=extract_cols, skiprows=bank_dets.start_row-1, names=col_names, nrows=no_rows)
-        final_df = pd.concat(final_df, df)
+        final_df = pd.concat([final_df, df])
         #final_df = final_df.append(df)
 
     py_format = DateFormat.query.filter_by(date_id = bank_dets.date_id).first()
