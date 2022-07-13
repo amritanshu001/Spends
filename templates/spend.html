@@ -100,23 +100,23 @@
           <div class="col-lg-12">
             <div class="well bs-component">
               <div class="row">
-                <div class="col-lg-2 control-label" style="text-align: center;">
+                <div class="col-lg-2 control-label" >
                   {{ form.opening_bal.label.text }}
                 </div>
                 <div class="col-lg-2">
                   {{ form.opening_bal(class_="form-control", style= "text-align:center") }}
                 </div>
-                <div class="col-lg-2 control-label" style="text-align: center;">
+                <div class="col-lg-2 control-label" >
                   {{ form.closing_bal.label.text }}
                 </div>
                 <div class="col-lg-2">
                   {{ form.closing_bal(class_="form-control") }}
                 </div>
-                <div class="col-lg-2 control-label" style="text-align: center; ">
+                <div class="col-lg-2 control-label" style=" font: bold;">
                   {% if (form.closing_bal.data >= form.opening_bal.data) %}
-                    <span style="font: bold; color: #0b741c;">Surplus</span>
+                    Surplus
                   {% else %}
-                    <span style="font: bold; color: #a81010;">Deficit</span>
+                    Deficit
                   {% endif %}
                 </div>
                 <div class="col-lg-2">
