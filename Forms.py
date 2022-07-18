@@ -1,7 +1,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, DecimalField, ValidationError
-from wtforms.validators import InputRequired, Length, NumberRange
+from wtforms.validators import InputRequired, Length, NumberRange, Optional
 from CreateTransactionModel import db, BankDetails, DateFormat
 from pathlib import Path
 from wtforms.fields import DateField
@@ -82,11 +82,15 @@ class Top5(Form):
     txn_no = IntegerField("Transaction Number", validators=[NumberRange(min=1)], render_kw = {'readonly':True})
     txn_date = DateField("Transaction Date", render_kw = {'readonly':True})#,format='%d-%b-%Y')
     txn_amt = DecimalField("Transaction Amount", render_kw = {'readonly':True})
+    txn_remarks = StringField("Remarks", render_kw = {'readonly':True})
 
 class SpendsAnalysis(FlaskForm):
     select_account = SelectField("Select Account", validators=[InputRequired()], coerce=int, choices=[])
     frm_date = DateField("From Date", validators=[InputRequired()])
     to_date = DateField("To Date",validators=[InputRequired()])
+    from_amt = DecimalField("From Amount", validators=[Optional()])
+    to_amt = DecimalField("To Amount", validators=[Optional()])
+    srch_remarks = StringField("Transaction Remark contains", validators=[Optional()])
     opening_bal = DecimalField(label="Opening Balance", render_kw = {'readonly':True})
     outgoing = DecimalField("Outgoing", render_kw = {'readonly':True})
     incoming = DecimalField("Incoming", render_kw = {'readonly':True})

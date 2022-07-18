@@ -62,6 +62,7 @@ def spendanalysis():
         return(redirect(url_for('login')))
     display = False
     messages = {}
+    res_view = {}
     form = SpendsAnalysis()
     user = AccountHolder.query.filter_by(user_id = cur_user['uid']).first()
     form.select_account.choices = [("0","---")] + [(i.account_id, i.account_no) for i in user.accounts]
@@ -76,65 +77,120 @@ def spendanalysis():
             messages['longmsg'] = "To Date cannot be greater than from date"
         else:
             txns = Acc_Transaction.query.filter(Acc_Transaction.acc_id == cur_acc, Acc_Transaction.txn_date.between(from_date,to_date))
-            if txns.all():
-                display = True
-                top5cr = txns.filter(Acc_Transaction.withdrawal_amt == 0).order_by(Acc_Transaction.deposit_amt.desc()).limit(5).all()
-                top5dr = txns.filter(Acc_Transaction.deposit_amt == 0).order_by(Acc_Transaction.withdrawal_amt.desc()).limit(5).all()
-                first_txn = txns.order_by(Acc_Transaction.txn_date).first()
-                last_txn = txns.order_by(Acc_Transaction.txn_date.desc()).first()
-                credit_summary = txns.with_entities(db.func.sum(Acc_Transaction.deposit_amt).label("Sum"),db.func.count(Acc_Transaction.txn_id).label("Count")).filter(Acc_Transaction.withdrawal_amt == 0).all()
-                debit_summary = txns.with_entities(db.func.sum(Acc_Transaction.withdrawal_amt).label("Sum"),db.func.count(Acc_Transaction.txn_id).label("Count")).filter(Acc_Transaction.deposit_amt == 0).all()
-
-                form.incoming.data = credit_summary[0][0]
-                form.incoming_txn.data = credit_summary[0][1]
-                form.incoming_avg.data = credit_summary[0][0] / credit_summary[0][1]
-
-                form.outgoing.data = debit_summary[0][0]
-                form.outgoing_txn.data = debit_summary[0][1]
-                form.outgoing_avg.data = debit_summary[0][0] / debit_summary[0][1]
-
-                form.opening_bal.data = first_txn.balance + first_txn.withdrawal_amt - first_txn.deposit_amt
-                form.closing_bal.data = last_txn.balance
-
-                if form.closing_bal.data >= form.opening_bal.data:
-                    form.balance.data = form.closing_bal.data - form.opening_bal.data
-                    form.balance(style = "font:bold; color:rgb(11, 129, 37)")
+            if form.from_amt.data:
+                if not form.to_amt.data:
+                    txns = txns.filter(db.or_(Acc_Transaction.withdrawal_amt >= form.from_amt.data,Acc_Transaction.deposit_amt >= form.from_amt.data))
                 else:
-                    form.balance.data = form.opening_bal.data - form.closing_bal.data
-                    form.balance(style = "font:bold; color:#a81010")
+                    if form.from_amt.data < form.to_amt.data:
+                        txns = txns.filter(db.or_(Acc_Transaction.withdrawal_amt.between(form.from_amt.data,form.to_amt.data),Acc_Transaction.deposit_amt.between(form.from_amt.data,form.to_amt.data)))
+                    else:
+                        messages['msg_stat'] = "alert-danger"
+                        messages['shortmsg'] = "Error!"
+                        messages['longmsg'] = "To amount cannot be greater than From amount" 
+            if 'msg_stat' not in messages:
+                if form.srch_remarks.data:
+                    txns = txns.filter(Acc_Transaction.txn_remarks.ilike("%{}%".format(form.srch_remarks.data)))
+                
+            if 'msg_stat' not in messages:                      
+                if txns.all():
+                    display = True
+                    top5cr = txns.filter(Acc_Transaction.withdrawal_amt == 0).order_by(Acc_Transaction.deposit_amt.desc()).limit(5).all()
+                    top5dr = txns.filter(Acc_Transaction.deposit_amt == 0).order_by(Acc_Transaction.withdrawal_amt.desc()).limit(5).all()
+                    first_txn = txns.order_by(Acc_Transaction.txn_date).first()
+                    last_txn = txns.order_by(Acc_Transaction.txn_date.desc()).first()
+                    credit_summary = txns.with_entities(db.func.sum(Acc_Transaction.deposit_amt).label("Sum"),db.func.count(Acc_Transaction.txn_id).label("Count")).filter(Acc_Transaction.withdrawal_amt == 0).all()
+                    debit_summary = txns.with_entities(db.func.sum(Acc_Transaction.withdrawal_amt).label("Sum"),db.func.count(Acc_Transaction.txn_id).label("Count")).filter(Acc_Transaction.deposit_amt == 0).all()
 
-                sums = 0.00
-                for ser, txn in enumerate(top5cr,1):
-                    txn5 = Top5()
-                    txn5.txn_no = ser
-                    txn5.txn_date = txn.txn_date
-                    txn5.txn_amt = txn.deposit_amt
-                    sums += txn.deposit_amt
-                    form.top_5_credit.append_entry(txn5)
-                form.top5_share_credit.data = (sums/credit_summary[0][0])*100
+                    if credit_summary[0][1]:
+                        form.incoming.data = credit_summary[0][0]
+                        form.incoming_txn.data = credit_summary[0][1]
+                        form.incoming_avg.data = credit_summary[0][0] / credit_summary[0][1]
+                        res_view['incoming'] = credit_summary[0][0]
+                        res_view['incoming_txn'] = credit_summary[0][1]
+                        res_view['incoming_avg'] = credit_summary[0][0] / credit_summary[0][1]
+ 
+                    if debit_summary[0][1]:
+                        form.outgoing.data = debit_summary[0][0]
+                        form.outgoing_txn.data = debit_summary[0][1]
+                        form.outgoing_avg.data = debit_summary[0][0] / debit_summary[0][1]
+                        res_view['outgoing'] = debit_summary[0][0]
+                        res_view['outgoing_txn'] = debit_summary[0][1]
+                        res_view['outgoing_avg'] = debit_summary[0][0] / debit_summary[0][1]
 
-                sums=0.00
-                for ser, txn in enumerate(top5dr,1):
-                    txn5 = Top5()
-                    txn5.txn_no = ser
-                    txn5.txn_date = txn.txn_date
-                    txn5.txn_amt = txn.withdrawal_amt
-                    sums += txn.withdrawal_amt
-                    form.top_5_debit.append_entry(txn5)
-                form.top5_share_debit.data = (sums/debit_summary[0][0])*100
-            else:
-                messages['msg_stat'] = "alert-info"
-                messages['shortmsg'] = "Information!"
-                messages['longmsg'] = "No Values found in database for above search criteria"
+                    if first_txn:
+                        form.opening_bal.data = first_txn.balance + first_txn.withdrawal_amt - first_txn.deposit_amt
+                        res_view['opening_bal'] = first_txn.balance + first_txn.withdrawal_amt - first_txn.deposit_amt
+                    if last_txn:
+                        form.closing_bal.data = last_txn.balance
+                        res_view['closing_bal'] = last_txn.balance
+
+                    if form.closing_bal.data >= form.opening_bal.data:
+                        form.balance.data = form.closing_bal.data - form.opening_bal.data
+                        res_view['balance'] = form.closing_bal.data - form.opening_bal.data
+                        res_view['position'] = "Surplus"
+                        res_view['color'] = "#0b741c"
+                    else:
+                        form.balance.data = form.opening_bal.data - form.closing_bal.data
+                        res_view['balance'] = form.opening_bal.data - form.closing_bal.data
+                        res_view['position'] = "Deficit"
+                        res_view['color'] = "#a81010"
+
+                    sums = 0.00
+                    if top5cr:
+                        lst_cr5 = []
+                        for ser, txn in enumerate(top5cr,1):
+                            cr5 = {}
+                            txn5 = Top5()
+                            txn5.txn_no = ser
+                            txn5.txn_date = txn.txn_date
+                            txn5.txn_amt = txn.deposit_amt
+                            txn5.txn_remarks = txn.txn_remarks
+                            sums += txn.deposit_amt
+                            form.top_5_credit.append_entry(txn5)
+
+                            cr5['txn_no'] = ser
+                            cr5['txn_date'] = txn.txn_date
+                            cr5['txn_amt'] = txn.deposit_amt
+                            cr5['txn_remarks'] = txn.txn_remarks
+                            lst_cr5.append(cr5)
+                        res_view['top_5_credit'] = lst_cr5
+
+                        form.top5_share_credit.data = (sums/credit_summary[0][0])*100
+                        res_view['top5_share_credit'] = (sums/credit_summary[0][0])*100
+
+                    sums=0.00
+                    if top5dr:
+                        lst_dr5 = []
+                        for ser, txn in enumerate(top5dr,1):
+                            txn5 = Top5()
+                            dr5 = {}
+                            txn5.txn_no = ser
+                            txn5.txn_date = txn.txn_date
+                            txn5.txn_amt = txn.withdrawal_amt
+                            txn5.txn_remarks = txn.txn_remarks
+                            sums += txn.withdrawal_amt
+                            form.top_5_debit.append_entry(txn5)
+                            dr5['txn_no'] = ser
+                            dr5['txn_date'] = txn.txn_date
+                            dr5['txn_amt'] = txn.deposit_amt
+                            dr5['txn_remarks'] = txn.txn_remarks
+                            lst_dr5.append(cr5)
+                        res_view['top_5_debit'] = lst_dr5
+
+                        form.top5_share_debit.data = (sums/debit_summary[0][0])*100
+                        res_view['top5_share_debit'] = (sums/debit_summary[0][0])*100
+                else:
+                    messages['msg_stat'] = "alert-info"
+                    messages['shortmsg'] = "Information!"
+                    messages['longmsg'] = "No Values found in database for above search criteria"
 
     else:
         if request.method == 'POST':
-            print ("Before Error Handling: {}".format(display))
             messages['msg_stat'] = "alert-danger"
             messages['shortmsg'] = "Error!"
             messages['longmsg'] = "{}".format(form.errors)
 
-    return render_template("spend.html", activepage = activepage, cur_user = cur_user, form = form, messages = messages, display = display)
+    return render_template("spend.html", activepage = activepage, cur_user = cur_user, form = form, messages = messages, display = display, res_view = res_view)
 
 @app.route('/login', methods = ['GET','POST'])
 def login():
