@@ -79,7 +79,29 @@
                     <div class="col-lg-4">
                       {{ form.to_date(class_="form-control") }}
                     </div>
-                  </div>                  
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-2 control-label">
+                      {{ form.from_amt.label.text }}
+                    </div>
+                    <div class="col-lg-4">
+                      {{ form.from_amt(class_="form-control") }}
+                    </div>
+                    <div class="col-lg-2 control-label">
+                      {{ form.to_amt.label.text }}
+                    </div>
+                    <div class="col-lg-4">
+                      {{ form.to_amt(class_="form-control") }}
+                    </div>
+                  </div>   
+                  <div class="form-group">
+                    <div class="col-lg-2 control-label">
+                      {{ form.srch_remarks.label.text }}
+                    </div>
+                    <div class="col-lg-8">
+                      {{ form.srch_remarks(class_="form-control") }}
+                    </div>
+                  </div>                
                   <div class="form-group">
                     <div class="col-lg-10 col-lg-offset-2">
                       {{ form.spend(class_ = "btn btn-primary") }}
