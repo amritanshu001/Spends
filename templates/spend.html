@@ -27,9 +27,9 @@
         padding: 10px;
       }
       
-      /*tr:nth-child(even) {
+      tr:nth-child(even) {
         background-color: #dddddd;
-      }*/
+      }
       </style>
   </head>
 
@@ -119,38 +119,36 @@
         {% endif %}
         {% if display %}
         <div class="row">
-          <div class="col-lg-12">
+          <div class="col-lg-12">            
             <div class="well bs-component">
               <div class="row">
                 <div class="col-lg-2 control-label" >
-                  {{ form.opening_bal.label.text }}
+                  Opening Balance
                 </div>
                 <div class="col-lg-2">
-                  {{ form.opening_bal(class_="form-control", style= "text-align:center") }}
+                  {{ res_view.opening_bal }}
                 </div>
                 <div class="col-lg-2 control-label" >
-                  {{ form.closing_bal.label.text }}
+                  Closing Balance
                 </div>
                 <div class="col-lg-2">
-                  {{ form.closing_bal(class_="form-control") }}
+                  {{ res_view.closing_bal }}
                 </div>
-                <div class="col-lg-2 control-label" style=" font: bold;">
-                  {% if (form.closing_bal.data >= form.opening_bal.data) %}
-                    Surplus
-                  {% else %}
-                    Deficit
-                  {% endif %}
+                <div class="col-lg-2 control-label" style="font: bold;">
+                    {{ res_view.position }}
                 </div>
-                <div class="col-lg-2">
-                  {% if (form.closing_bal.data > form.opening_bal.data) %}
-                    {{ form.balance(class_="form-control", style= "font:bold; color:#0b741c") }}
-                  {% else %}
-                    {{ form.balance(class_="form-control", style= "font:bold; color:#a81010") }}
-                  {% endif %}
+                {% if res_view.position == 'Surplus' %}
+                <div class="col-lg-2" style= "font:bold; color:#0b741c">
+                    {{ res_view.balance }}
                 </div>
+                {% else %}
+                <div class="col-lg-2" style= "font:bold; color:#a81010">
+                    {{ res_view.balance }}
+                </div> 
+                {% endif %}               
               </div>
-
             </div>
+            
           </div>
         </div>
 
@@ -166,15 +164,42 @@
                 </tr>
                 <tr style="background-color: #8387c5;">
                   <td style="font: bold; color: rgb(11, 129, 37); text-align: center; font-size: large;" class="control-label">{{ form.incoming.label }}</td>
-                  <td>{{ form.incoming(class_="form-control") }}</td>
-                  <td>{{ form.incoming_txn(class_="form-control") }}</td>
-                  <td>{{ form.incoming_avg(class_="form-control") }}</td>
+                  <td>{{ form.incoming }}</td>
+                  <td>{{ form.incoming_txn }}</td>
+                  <td>{{ form.incoming_avg }}</td>
                 </tr>
                 <tr style="background-color: #8387c5;">
                   <td style="font: bold; color: rgb(136, 55, 41); text-align: center; font-size: large;" class="control-label">{{ form.outgoing.label }}</td>
                   <td>{{ form.outgoing(class_="form-control") }}</td>
                   <td>{{ form.outgoing_txn(class_="form-control") }}</td>
                   <td>{{ form.outgoing_avg(class_="form-control") }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="well bs-component">
+              <table style="width:100%">
+                <tr style="background-color: #8387c5;">
+                  <th></th>
+                  <th style="font: bold; text-align: left;color: #043515;">Amount</th>
+                  <th style="font: bold; text-align: left;color: #043515;">No. of Transaction</th>
+                  <th style="font: bold; text-align: left;color: #043515;">Avg per Transaction</th>
+                </tr>
+                <tr style="background-color: #8387c5;">
+                  <td style="font: bold; color: rgb(11, 129, 37); text-align: justify; " class="control-label">Incoming</td>
+                  <td>{{ res_view.incoming }}</td>
+                  <td>{{ res_view.incoming_txn }}</td>
+                  <td>{{ res_view.incoming_avg }}</td>
+                </tr>
+                <tr style="background-color: #8387c5;">
+                  <td style="font: bold; color: rgb(136, 55, 41); text-align: justify;" class="control-label">Outgoing</td>
+                  <td>{{ res_view.outgoing }}</td>
+                  <td>{{ res_view.outgoing_txn }}</td>
+                  <td>{{ res_view.outgoing_avg }}</td>
                 </tr>
               </table>
             </div>

@@ -102,20 +102,20 @@ def spendanalysis():
                     debit_summary = txns.with_entities(db.func.sum(Acc_Transaction.withdrawal_amt).label("Sum"),db.func.count(Acc_Transaction.txn_id).label("Count")).filter(Acc_Transaction.deposit_amt == 0).all()
 
                     if credit_summary[0][1]:
-                        form.incoming.data = credit_summary[0][0]
+                        form.incoming.data = round(credit_summary[0][0],2)
                         form.incoming_txn.data = credit_summary[0][1]
-                        form.incoming_avg.data = credit_summary[0][0] / credit_summary[0][1]
+                        form.incoming_avg.data = round(credit_summary[0][0] / credit_summary[0][1], 2)
                         res_view['incoming'] = credit_summary[0][0]
                         res_view['incoming_txn'] = credit_summary[0][1]
-                        res_view['incoming_avg'] = credit_summary[0][0] / credit_summary[0][1]
+                        res_view['incoming_avg'] = round(credit_summary[0][0] / credit_summary[0][1],2)
  
                     if debit_summary[0][1]:
-                        form.outgoing.data = debit_summary[0][0]
+                        form.outgoing.data = round(debit_summary[0][0],2)
                         form.outgoing_txn.data = debit_summary[0][1]
-                        form.outgoing_avg.data = debit_summary[0][0] / debit_summary[0][1]
+                        form.outgoing_avg.data = round(debit_summary[0][0] / debit_summary[0][1],2)
                         res_view['outgoing'] = debit_summary[0][0]
                         res_view['outgoing_txn'] = debit_summary[0][1]
-                        res_view['outgoing_avg'] = debit_summary[0][0] / debit_summary[0][1]
+                        res_view['outgoing_avg'] = round(debit_summary[0][0] / debit_summary[0][1],2)
 
                     if first_txn:
                         form.opening_bal.data = first_txn.balance + first_txn.withdrawal_amt - first_txn.deposit_amt
@@ -174,7 +174,7 @@ def spendanalysis():
                             dr5['txn_date'] = txn.txn_date
                             dr5['txn_amt'] = txn.deposit_amt
                             dr5['txn_remarks'] = txn.txn_remarks
-                            lst_dr5.append(cr5)
+                            lst_dr5.append(dr5)
                         res_view['top_5_debit'] = lst_dr5
 
                         form.top5_share_debit.data = (sums/debit_summary[0][0])*100
