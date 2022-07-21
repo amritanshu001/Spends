@@ -30,6 +30,20 @@
       tr:nth-child(even) {
         background-color: #dddddd;
       }
+
+      .tooltipTrigger .tooltip {
+        display: none;
+      }
+      .tooltipTrigger:hover {
+        cursor: pointer;
+      }
+      .tooltipTrigger:hover .tooltip { 
+        display: inline;
+        position: relative; /* relative to .tooltipTrigger */
+        left: 10px;
+        border: 1px solid rgb(153, 23, 23);
+      }
+
       </style>
   </head>
 
@@ -126,24 +140,24 @@
                   Opening Balance
                 </div>
                 <div class="col-lg-2">
-                  {{ res_view.opening_bal }}
+                  {{ form.opening_bal(style= "text-align: center", class_="form-control") }}
                 </div>
                 <div class="col-lg-2 control-label" >
                   Closing Balance
                 </div>
                 <div class="col-lg-2">
-                  {{ res_view.closing_bal }}
+                  {{ form.closing_bal(style= "text-align: center", class_="form-control") }}
                 </div>
                 <div class="col-lg-2 control-label" style="font: bold;">
                     {{ res_view.position }}
                 </div>
                 {% if res_view.position == 'Surplus' %}
-                <div class="col-lg-2" style= "font:bold; color:#0b741c">
-                    {{ res_view.balance }}
+                <div class="col-lg-2">
+                    {{ form.balance(style= "text-align: center; font:bold; color:#0b741c", class_="form-control") }}
                 </div>
                 {% else %}
-                <div class="col-lg-2" style= "font:bold; color:#a81010">
-                    {{ res_view.balance }}
+                <div class="col-lg-2">
+                    {{ form.balance(style= "text-align: center; font:bold; color:#a81010", class_="form-control") }}
                 </div> 
                 {% endif %}               
               </div>
@@ -158,21 +172,21 @@
               <table style="width:100%">
                 <tr style="background-color: #8387c5;">
                   <th></th>
-                  <th style="font: bold; text-align: left;color: #043515;">Amount</th>
-                  <th style="font: bold; text-align: left;color: #043515;">No. of Transaction</th>
-                  <th style="font: bold; text-align: left;color: #043515;">Avg per Transaction</th>
+                  <th style="font: bold; text-align: center;color: #043515;">Amount</th>
+                  <th style="font: bold; text-align: center;color: #043515;">No. of Transaction</th>
+                  <th style="font: bold; text-align: center;color: #043515;">Avg per Transaction</th>
                 </tr>
                 <tr style="background-color: #8387c5;">
                   <td style="font: bold; color: rgb(11, 129, 37); text-align: center; font-size: large;" class="control-label">{{ form.incoming.label }}</td>
-                  <td>{{ form.incoming }}</td>
-                  <td>{{ form.incoming_txn }}</td>
-                  <td>{{ form.incoming_avg }}</td>
+                  <td>{{ form.incoming(style= "text-align: center", class_="form-control") }}</td>
+                  <td>{{ form.incoming_txn(style= "text-align: center", class_="form-control") }}</td>
+                  <td>{{ form.incoming_avg(style= "text-align: center", class_="form-control") }}</td>
                 </tr>
                 <tr style="background-color: #8387c5;">
                   <td style="font: bold; color: rgb(136, 55, 41); text-align: center; font-size: large;" class="control-label">{{ form.outgoing.label }}</td>
-                  <td>{{ form.outgoing(class_="form-control") }}</td>
-                  <td>{{ form.outgoing_txn(class_="form-control") }}</td>
-                  <td>{{ form.outgoing_avg(class_="form-control") }}</td>
+                  <td>{{ form.outgoing(style= "text-align: center", class_="form-control") }}</td>
+                  <td>{{ form.outgoing_txn(style= "text-align: center", class_="form-control") }}</td>
+                  <td>{{ form.outgoing_avg(style= "text-align: center", class_="form-control") }}</td>
                 </tr>
               </table>
             </div>
@@ -180,47 +194,22 @@
         </div>
         
         <div class="row">
-          <div class="col-lg-12">
-            <div class="well bs-component">
-              <table style="width:100%">
-                <tr style="background-color: #8387c5;">
-                  <th></th>
-                  <th style="font: bold; text-align: left;color: #043515;">Amount</th>
-                  <th style="font: bold; text-align: left;color: #043515;">No. of Transaction</th>
-                  <th style="font: bold; text-align: left;color: #043515;">Avg per Transaction</th>
-                </tr>
-                <tr style="background-color: #8387c5;">
-                  <td style="font: bold; color: rgb(11, 129, 37); text-align: justify; " class="control-label">Incoming</td>
-                  <td>{{ res_view.incoming }}</td>
-                  <td>{{ res_view.incoming_txn }}</td>
-                  <td>{{ res_view.incoming_avg }}</td>
-                </tr>
-                <tr style="background-color: #8387c5;">
-                  <td style="font: bold; color: rgb(136, 55, 41); text-align: justify;" class="control-label">Outgoing</td>
-                  <td>{{ res_view.outgoing }}</td>
-                  <td>{{ res_view.outgoing_txn }}</td>
-                  <td>{{ res_view.outgoing_avg }}</td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
           <div class="col-lg-6">
             <div class="well bs-component" style="background-color:#a99cbb ;">
-              <table style="width:100%" >
-                <caption style="color: #0b741c;text-align: center; font:bold caption; font-size:medium; ">Top 5 Credit Txns</caption>
-                <tr>
-                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">S. No</th>
-                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Txn Date</th>
-                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Amount</th>
+              <table style="width:100%;">
+                <caption style="color: #0b741c;text-align: center; font:bold caption; font-size:medium;border: 3px solid #16072b; ">Top 5 Credit Txns</caption>
+                <tr style = "border: 3px solid #16072b;">
+                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15)">S. No</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);">Txn Date</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);">Amount</th>
                 </tr> 
                 {% for txn in form.top_5_credit %}
                 <tr>
-                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_no(class_="form-control") }}</th>
-                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_date(class_="form-control") }}</th>
-                  <td style = "font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_amt(class_="form-control") }}</th>
+                  <td>{{ txn.txn_no(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control tooltipTrigger") }}
+                    <span class="tooltip">{{txn.txn_remarks}}</span>
+                  </td>
+                  <td>{{ txn.txn_date(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control") }}</td>
+                  <td>{{ txn.txn_amt(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control") }}</td>
                 </tr>
                 {% endfor %}
               </table>
@@ -229,17 +218,19 @@
           <div class="col-lg-6" >
             <div class="well bs-component" style="background-color:#a99cbb ;">
               <table style="width:100%" >
-                <caption style="color: #a81010;text-align: center; font:bold caption; font-size:medium;">Top 5 Debit Txns</caption>
+                <caption style="color: #a81010;text-align: center; font:bold caption; font-size:medium;border: 3px solid #16072b;">Top 5 Debit Txns</caption>
                 <tr>
-                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;" class="control-label">S. No</th>
-                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Txn Date</th>
-                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">Amount</th>
+                  <th style = "width:15%; font: bold; text-align: center; color: rgb(15, 15, 15);" class="control-label">S. No</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);">Txn Date</th>
+                  <th style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);">Amount</th>
                 </tr> 
                 {% for txn in form.top_5_debit %}
                 <tr>
-                  <td style = "width:15%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_no(class_="form-control") }}</th>
-                  <td style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_date(class_="form-control") }}</th>
-                  <td style = "width:35%;font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;">{{ txn.txn_amt(class_="form-control") }}</th>
+                  <td>{{ txn.txn_no(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control tooltipTrigger") }}
+                    <span class="tooltip">{{txn.txn_remarks(style="color: #2b3e50")}}</span>
+                  </td>
+                  <td>{{ txn.txn_date(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control") }}</td>
+                  <td>{{ txn.txn_amt(style="font: bold; text-align: center; color: rgb(15, 15, 15);border: 1px solid #000000;", class_="form-control") }}</td>
                 </tr>
                 {% endfor %}
               </table>
