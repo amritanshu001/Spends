@@ -23,9 +23,10 @@ def processfile(path, bankid):
             for row in sheet.iter_rows(min_row = bank_dets.start_row+1, min_col = bank_dets.val_date_col, max_col = bank_dets.val_date_col):
                 for cell in row:
                     if cell.value == None or cell.value == "":
-                        sht_last_row[sheet.title] = cell.row-1
-                        f=1
-                        break
+                        if sheet.cell(cell.row+1,bank_dets.val_date_col).value == None or sheet.cell(cell.row+1,bank_dets.val_date_col).value == "":
+                            sht_last_row[sheet.title] = cell.row-1
+                            f=1
+                            break
                 if f == 1:
                     break
         wb.close()
@@ -37,9 +38,10 @@ def processfile(path, bankid):
             for row in range(bank_dets.start_row, sht.nrows):
                 for col in range(bank_dets.val_date_col, bank_dets.val_date_col+1):
                     if sht.cell(row,col-1).value == None or sht.cell(row,col-1).value == "":
-                        f=1
-                        sht_last_row[sheet_name] = row
-                        break
+                        if sht.cell(row+1,col-1).value == None or sht.cell(row+1,col-1).value == "":
+                            f=1
+                            sht_last_row[sheet_name] = row
+                            break
                 if f == 1:
                     break
 
@@ -58,7 +60,6 @@ def processfile(path, bankid):
         no_rows = sht_last_row[sheet] - bank_dets.start_row
         df = pd.read_excel(path, sheet_name=sheet, usecols=extract_cols, skiprows=bank_dets.start_row-1, names=col_names, nrows=no_rows)
         final_df = pd.concat([final_df, df])
-        #final_df = final_df.append(df)
 
     py_format = DateFormat.query.filter_by(date_id = bank_dets.date_id).first()
 
@@ -68,6 +69,6 @@ def processfile(path, bankid):
     final_df['deposit_amt'] = pd.to_numeric(final_df['deposit_amt'])
     final_df['balance'] = pd.to_numeric(final_df['balance'])
 
-    return(final_df)
+    return(final_df.dropna(subset = 'txn_date'))
 
     
