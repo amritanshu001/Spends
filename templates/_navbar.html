@@ -20,3 +20,11 @@
     {% endif %}
 </ul>
 {% endmacro %}
+
+{% macro errorfields(field) %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            {{ error }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}

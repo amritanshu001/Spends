@@ -1,7 +1,7 @@
 
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField, EmailField, SelectField, Form, FormField, FieldList, BooleanField, SubmitField, IntegerField, FileField, DecimalField, ValidationError
-from wtforms.validators import InputRequired, Length, NumberRange, Optional
+from wtforms.validators import InputRequired, Length, NumberRange, Optional, EqualTo
 from CreateTransactionModel import db, BankDetails, DateFormat
 from pathlib import Path
 from wtforms.fields import DateField
@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
             Length(min= 8, max= 200)
     ])
     password = PasswordField("Password", validators=[InputRequired(message = "Password cannot be blank"),
-            Length(min= 8, max= 50)
+            Length(min= 8, max= 50),
     ])
 
 class DelBankData(Form):
@@ -33,11 +33,13 @@ class RegisterForm(FlaskForm):
             Length(min = 8, max= 200)
     ])
     password = PasswordField("Password", validators=[InputRequired(message = "Password cannot be blank"),
-            Length(min= 8, max= 50)
+            Length(min= 8, max= 50),
+            EqualTo('repassword', message = "**Passwords must match")
     ])
     email = EmailField("Email Id", validators=[InputRequired(message = "Email cannot be blank"),
             Length(min= 8, max= 200)
     ])
+    repassword = PasswordField("Re-enter Password", validators=[InputRequired()])
 
 class AddAccount(FlaskForm):
     banks = FieldList(FormField(BankData),min_entries=3)
