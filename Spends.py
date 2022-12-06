@@ -12,6 +12,7 @@ from processfile import processfile
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload, SpendsAnalysis, Top5
 from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllowed
 import platform
+import json
 
 
 app = Flask(__name__)
@@ -513,6 +514,13 @@ def manageaccount():
 
     return render_template("addaccount.html", activepage=activepage, form=form, messages=messages, cur_user=cur_user, delform=delform, delmessages=delmessages)
 
+
+@app.route('/dateformats') 
+def dateformats():
+    formats = []
+    for format in DateFormat.query.all():
+        formats.append({"id":format.date_id,"dateformat":format.date_format})
+    return json.dumps(formats, default=str),200
 
 @app.route('/logout')
 def logout():
