@@ -12,10 +12,12 @@ from processfile import processfile
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload, SpendsAnalysis, Top5
 from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllowed
 import platform
+from flask_cors import CORS, cross_origin
 import json
 
 
 app = Flask(__name__)
+cors = CORS(app)
 
 docs = UploadSet('statement', DOCUMENTS)
 
@@ -516,6 +518,7 @@ def manageaccount():
 
 
 @app.route('/dateformats') 
+@cross_origin()
 def dateformats():
     formats = []
     for format in DateFormat.query.all():
