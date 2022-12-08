@@ -17,7 +17,7 @@ import json
 
 
 app = Flask(__name__)
-cors = CORS(app)
+# cors = CORS(app)
 
 docs = UploadSet('statement', DOCUMENTS)
 
@@ -518,7 +518,7 @@ def manageaccount():
 
 
 @app.route('/dateformats') 
-@cross_origin()
+# @cross_origin()
 def dateformats():
     formats = []
     for format in DateFormat.query.all():
