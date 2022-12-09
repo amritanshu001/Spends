@@ -518,7 +518,7 @@ def manageaccount():
 
 
 @app.route('/dateformats') 
-# @cross_origin()
+@cross_origin()
 def dateformats():
     formats = []
     for format in DateFormat.query.all():
