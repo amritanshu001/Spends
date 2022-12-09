@@ -520,10 +520,10 @@ def manageaccount():
 @app.route('/dateformats') 
 @cross_origin()
 def dateformats():
-    formats = []
+    formats = {}
     for format in DateFormat.query.all():
-        formats.append({"id":format.date_id,"dateformat":format.date_format})
-    return json.dumps(formats, default=str),200
+        formats[format.date_id] = {"dateformat":format.date_format}
+    return formats,200
 
 @app.route('/logout')
 def logout():
