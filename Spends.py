@@ -517,13 +517,14 @@ def manageaccount():
     return render_template("addaccount.html", activepage=activepage, form=form, messages=messages, cur_user=cur_user, delform=delform, delmessages=delmessages)
 
 
-@app.route('/dateformats') 
+@app.route('/dateformats')
 @cross_origin()
 def dateformats():
     formats = {}
     for format in DateFormat.query.all():
-        formats[format.date_id] = {"dateformat":format.date_format}
-    return formats,200
+        formats[format.date_id] = {"dateformat": format.date_format}
+    return formats, 200
+
 
 @app.route('/logout')
 def logout():
@@ -534,4 +535,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5001)
