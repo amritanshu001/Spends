@@ -1,25 +1,23 @@
 from flask import Flask, render_template, request, g, redirect, url_for, session
-from flask_sqlalchemy import SQLAlchemy as sql
-from datetime import datetime
 from CreateTransactionModel import db, BankDetails, Acc_Transaction, Account, AccountHolder, DateFormat
 from databaseconnect import get_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
-import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from processfile import processfile
 from Forms import LoginForm, DelAccount, DelBankData, BankData, RegisterForm, AddAccount, DelAccount, BankForm, BankList, Upload, SpendsAnalysis, Top5
 from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllowed
 import platform
 from flask_cors import CORS, cross_origin
-import json
-
+from flask_smorest import Api
+from resources.dateformats import blp as DateFormatBlueprint
 
 app = Flask(__name__)
-# cors = CORS(app)
+
 
 docs = UploadSet('statement', DOCUMENTS)
+
 
 if platform.system() == 'Linux':
     app.config["DEBUG"] = True
@@ -31,10 +29,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOADED_STATEMENT_DEST'] = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), 'temp')
 app.config['UPLOADED_STATEMENT_ALLOW'] = ['xls', 'xlsx']
+app.config["API_TITLE"] = "Spend Analysis APIs"
+app.config["API_VERSION"] = "V1"
+app.config["OPENAPI_VERSION"] = "3.0.3"
+app.config["OPENAPI_URL_PREFIX"] = "/"
+app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.20.3/"
 
 configure_uploads(app, docs)
 
 db.init_app(app)
+api = Api(app)
+cors = CORS(app)
 
 
 def get_current_user():
@@ -517,13 +523,7 @@ def manageaccount():
     return render_template("addaccount.html", activepage=activepage, form=form, messages=messages, cur_user=cur_user, delform=delform, delmessages=delmessages)
 
 
-@app.route('/dateformats')
-@cross_origin()
-def dateformats():
-    formats = {}
-    for format in DateFormat.query.all():
-        formats[format.date_id] = {"dateformat": format.date_format}
-    return formats, 200
+api.register_blueprint(DateFormatBlueprint)
 
 
 @app.route('/logout')
