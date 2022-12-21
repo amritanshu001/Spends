@@ -15,6 +15,7 @@ from flask_jwt_extended import JWTManager
 
 from resources.dateformats import blp as DateFormatBlueprint
 from resources.usermanagement import blp as UsersBlueprint
+from resources.bankmanagement import blp as BanksBlueprint
 
 app = Flask(__name__)
 
@@ -45,6 +46,12 @@ db.init_app(app)
 api = Api(app)
 cors = CORS(app)
 jwt = JWTManager(app)
+
+
+@jwt.additional_claims_loader
+def set_admin(id):
+    user = AccountHolder.query.get(id)
+    return {"admin": user.admin}
 
 
 def get_current_user():
@@ -529,6 +536,7 @@ def manageaccount():
 
 api.register_blueprint(DateFormatBlueprint)
 api.register_blueprint(UsersBlueprint)
+api.register_blueprint(BanksBlueprint)
 
 
 @app.route('/logout')

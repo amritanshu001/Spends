@@ -26,3 +26,17 @@ class UserLogin(Schema):
     password = fields.Str(load_only=True)
     u_active = fields.Bool(dump_only=True)
     admin = fields.Bool()
+
+
+class BanksSchema(Schema):
+    bank_id = fields.Int(dump_only=True)
+    bank_name = fields.Str(required=True)
+    start_row = fields.Int(required=True)
+    val_date_col = fields.Int(required=True)
+    txn_date_col = fields.Int(required=True)
+    chq_no_col = fields.Int(required=True)
+    txn_rmrk_col = fields.Int(required=True)
+    with_amt_col = fields.Int(required=True)
+    crdt_amt_col = fields.Int(required=True)
+    bal_col = fields.Int(required=True)
+    date_id = fields.Int(required=True)
