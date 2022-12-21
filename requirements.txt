@@ -126,3 +126,4 @@ zipp==3.8.0
 zope.interface==5.4.0
 flask-smorest
 flask_jwt_extended
+redis

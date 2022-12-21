@@ -11,6 +11,7 @@ from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllo
 import platform
 from flask_cors import CORS, cross_origin
 from flask_smorest import Api
+from flask_jwt_extended import JWTManager
 
 from resources.dateformats import blp as DateFormatBlueprint
 from resources.usermanagement import blp as UsersBlueprint
@@ -43,6 +44,7 @@ configure_uploads(app, docs)
 db.init_app(app)
 api = Api(app)
 cors = CORS(app)
+jwt = JWTManager(app)
 
 
 def get_current_user():
