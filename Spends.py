@@ -11,7 +11,9 @@ from flask_uploads import configure_uploads, UploadSet, DOCUMENTS, UploadNotAllo
 import platform
 from flask_cors import CORS, cross_origin
 from flask_smorest import Api
+
 from resources.dateformats import blp as DateFormatBlueprint
+from resources.usermanagement import blp as UsersBlueprint
 
 app = Flask(__name__)
 
@@ -524,6 +526,7 @@ def manageaccount():
 
 
 api.register_blueprint(DateFormatBlueprint)
+api.register_blueprint(UsersBlueprint)
 
 
 @app.route('/logout')
