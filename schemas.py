@@ -8,9 +8,19 @@ class DateFormatSchema(Schema):
     py_date = fields.Str(dump_only=True)
 
 
-class AccountHolderSchema(Schema):
+class UserRegistration(Schema):
     user_id = fields.Int(dump_only=True)
     user_name = fields.Str(required=True)
+    email_id = fields.Email(required=True, default_error_messages={
+                            'invalid': 'Not a valid email address.'})
+    password = fields.Str(load_only=True)
+    u_active = fields.Bool(dump_only=True)
+    admin = fields.Bool()
+
+
+class UserLogin(Schema):
+    user_id = fields.Int(dump_only=True)
+    user_name = fields.Str(dump_only=True)
     email_id = fields.Email(required=True, default_error_messages={
                             'invalid': 'Not a valid email address.'})
     password = fields.Str(load_only=True)
