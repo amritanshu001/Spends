@@ -46,3 +46,63 @@ class Banks(MethodView):
             abort(404, message=str(q))
         else:
             return bank
+
+
+@blp.route("/banks/<int:bank_id>")
+class Bank(MethodView):
+    @cross_origin()
+    @jwt_required()
+    @blp.response(200, BanksSchema)
+    def get(self, bank_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        bank = BankDetails.query.get_or_404(bank_id)
+        return bank
+
+    @cross_origin()
+    @jwt_required()
+    def delete(self, bank_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        bank = BankDetails.query.get_or_404(bank_id)
+
+        try:
+            db.session.delete(bank)
+            db.session.commit()
+        except SQLAlchemyError as q:
+            db.session.rollback()
+            abort(422, message=str(q))
+        else:
+            return {"message": "Bank Deleted"}, 200
+
+    @cross_origin()
+    @jwt_required()
+    @blp.arguments(BanksSchema)
+    @blp.response(200, BanksSchema)
+    def put(self, bank_data, bank_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        bank = BankDetails.query.get(bank_id)
+        if not bank:
+            new_bank = BankDetails(**bank_data)
+            try:
+                db.session.add(new_bank)
+                db.session.commit()
+            except SQLAlchemyError as q:
+                db.session.rollback()
+                abort(422, message=str(q))
+            else:
+                return new_bank
+        bank = BankDetails(**bank_data, bank_id=bank_id)
+        print(bank)
+        try:
+            db.session.merge(bank)
+            db.session.commit()
+        except SQLAlchemyError as q:
+            db.session.rollback()
+            abort(422, message=str(q))
+        else:
+            return bank
