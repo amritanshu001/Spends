@@ -17,8 +17,9 @@ class Banks(MethodView):
     def get(self):
         jwt = get_jwt()
         if not jwt.get("admin"):
-            abort(401, "Only Admin has access to this feature")
+            abort(401, message="Only Admin has access to this feature")
         banks = BankDetails.query.all()
+
         return banks
 
     @cross_origin()
@@ -28,7 +29,7 @@ class Banks(MethodView):
     def post(self, bank_data):
         jwt = get_jwt()
         if not jwt.get("admin"):
-            abort(401, "Only Admin has access to this feature")
+            abort(401, message="Only Admin has access to this feature")
 
         bank = BankDetails(**bank_data)
 
@@ -58,6 +59,7 @@ class Bank(MethodView):
         if not jwt.get("admin"):
             abort(401, message="Only Admin has access to this feature")
         bank = BankDetails.query.get_or_404(bank_id)
+        print(bank)
         return bank
 
     @cross_origin()

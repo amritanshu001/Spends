@@ -39,4 +39,5 @@ class BanksSchema(Schema):
     with_amt_col = fields.Int(required=True)
     crdt_amt_col = fields.Int(required=True)
     bal_col = fields.Int(required=True)
-    date_id = fields.Int(required=True)
+    date_id = fields.Int(required=True, load_only=True)
+    date = fields.Nested(DateFormatSchema(), required=True, dump_only=True)
