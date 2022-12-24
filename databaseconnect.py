@@ -13,6 +13,7 @@ def get_engine():
         env_host = os.getenv("HOST")
         env_database = os.getenv("DATABASE")
         if env_password and env_database and env_host and env_user:
+            database = {}
             database["user"] = env_user
             database["password"] = env_password
             database["host"] = env_host
