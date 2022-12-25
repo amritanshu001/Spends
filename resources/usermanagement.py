@@ -60,4 +60,4 @@ class Logout(MethodView):
         user = AccountHolder.query.get_or_404(user_id)
         jti = get_jwt()["jti"]
         blocklist_connection.set(jti, "", ex=timedelta(hours=0.5))
-        return {"message": "User Logged Out"}, 201
+        return {"message": "User Logged Out", "ok":True}, 201
