@@ -41,3 +41,49 @@ class BanksSchema(Schema):
     bal_col = fields.Int(required=True)
     date_id = fields.Int(required=True, load_only=True)
     date = fields.Nested(DateFormatSchema(), required=True, dump_only=True)
+
+
+class AccountsSchema(Schema):
+    account_id = fields.Int(dump_only=True)
+    account_no = fields.Str(required=True)
+    active = fields.Boolean(dump_only=True)
+    joint = fields.Boolean(required=True)
+    bank = fields.Int(required=True, load_only=True)
+    bank_dets = fields.Nested(BanksSchema(), required=True, dump_only=True)
+
+
+class AccountTransactionsSchema(Schema):
+    txn_id = fields.Int(dump_only=True)
+    value_date = fields.DateTime(required=True, dump_only=True)
+    txn_date = fields.DateTime(required=True, dump_only=True)
+    txn_remarks = fields.String(required=True, dump_only=True)
+    cheque_no = fields.String(dump_only=True)
+    withdrawal_amt = fields.Float(dump_only=True)
+    deposit_amt = fields.Float(dump_only=True)
+    balance = fields.Float(required=True, dump_only=True)
+    account_no = fields.Str(dump_only=True)
+    acc_id = fields.Int(required=True, load_only=True)
+    from_date = fields.DateTime(load_only=True)
+    to_date = fields.DateTime(load_only=True)
+
+
+class AccountStatementSchema(AccountsSchema):
+    transactions = fields.List(fields.Nested(
+        AccountTransactionsSchema()), dump_only=True)
+
+
+class AccountUsersSchema(AccountsSchema):
+    users = fields.List(fields.Nested(UserRegistration()),
+                        required=True, dump_only=True)
+
+
+class UpdateAccountSchema(Schema):
+    joint = fields.Boolean(load_only=True)
+    active = fields.Boolean(load_only=True)
+
+
+class UploadTransactionsSchema(Schema):
+    account_id = fields.Int(load_only=True, required=True)
+    upload_file = fields.Field(load_only=True, required=True)
+    pass_count = fields.Int(required=True, dump_only=True)
+    fail_count = fields.Int(required=True, dump_only=True)

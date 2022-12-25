@@ -16,6 +16,8 @@ from flask_jwt_extended import JWTManager
 from resources.dateformats import blp as DateFormatBlueprint
 from resources.usermanagement import blp as UsersBlueprint
 from resources.bankmanagement import blp as BanksBlueprint
+from resources.accounts import blp as AccountsBlueprint
+from resources.transactions import blp as TransactionsBlueprint
 
 
 def create_app():
@@ -530,6 +532,8 @@ def create_app():
     api.register_blueprint(DateFormatBlueprint)
     api.register_blueprint(UsersBlueprint)
     api.register_blueprint(BanksBlueprint)
+    api.register_blueprint(AccountsBlueprint)
+    api.register_blueprint(TransactionsBlueprint)
 
     @app.route('/logout')
     def logout():

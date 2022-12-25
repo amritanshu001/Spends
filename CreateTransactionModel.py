@@ -36,7 +36,8 @@ class BankDetails(db.Model):
     date = db.relationship("DateFormat", backref='bank_details')
 
     # one to many relationship
-    accounts = db.relationship('Account', back_populates='bank_dets')
+    accounts = db.relationship(
+        'Account', back_populates='bank_dets', lazy="dynamic")
 
     def __repr__(self):
         return f'<Bank {self.bank_name}>'
@@ -73,7 +74,7 @@ class AccountHolder(db.Model):
     admin = db.Column(db.Boolean, default=False)
     # m:n relationships
     accounts = db.relationship(
-        'Account', secondary=account_users, back_populates="users")
+        'Account', secondary=account_users, back_populates="users", lazy="dynamic")
 
     def __repr__(self):
         return f'<User {self.user_name}>'
@@ -89,11 +90,13 @@ class Account(db.Model):
     # Foreign Key for 1:n relation
     bank = db.Column(db.Integer, db.ForeignKey(
         'bank_details.bank_id'), nullable=False)
-    bank_dets = db.relationship("BankDetails", back_populates="accounts")
+    bank_dets = db.relationship(
+        "BankDetails", back_populates="accounts")
     # one to many relationship
     users = db.relationship(
-        'AccountHolder', secondary=account_users, back_populates="accounts")
-    transactions = db.relationship('Acc_Transaction', backref='account')
+        'AccountHolder', secondary=account_users, back_populates="accounts", lazy="dynamic")
+    transactions = db.relationship(
+        'Acc_Transaction', back_populates='account_dets', lazy="dynamic")
 
     def __repr__(self):
         return f'<Account {self.account_no}>'
@@ -113,6 +116,7 @@ class Acc_Transaction(db.Model):
     # Foreign Key for 1:n relation
     acc_id = db.Column(db.Integer, db.ForeignKey(
         'account.account_id'), nullable=False)
+    account_dets = db.relationship("Account", back_populates="transactions")
     __table_args__ = (db.UniqueConstraint('value_date', 'txn_date', 'txn_remarks', 'withdrawal_amt', 'deposit_amt', 'balance', 'cheque_no',  name='unique_txn'),
                       )
 
