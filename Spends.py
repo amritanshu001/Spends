@@ -12,6 +12,7 @@ import platform
 from flask_cors import CORS, cross_origin
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
+from redis_connect.redis_connection import blocklist_connection
 
 from resources.dateformats import blp as DateFormatBlueprint
 from resources.usermanagement import blp as UsersBlueprint
@@ -54,6 +55,12 @@ def create_app():
     def set_admin(id):
         user = AccountHolder.query.get(id)
         return {"admin": user.admin}
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+        jti = jwt_payload["jti"]
+        token_in_redis = blocklist_connection.get(jti)
+        return token_in_redis is not None
 
     def get_current_user():
         user_dict = {}
