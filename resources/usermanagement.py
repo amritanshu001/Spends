@@ -51,13 +51,13 @@ class Login(MethodView):
         return {"access_token": access_token, "admin": user.admin}
 
 
-@blp.route("/userlogout/<int:user_id>")
+@blp.route("/userlogout")
 class Logout(MethodView):
     @cross_origin()
     @jwt_required()
-    def delete(self, user_id):
-        if not user_id == get_jwt_identity():
-            abort(404, message="User not logged in")
+    def delete(self):
+        user_id = get_jwt_identity()
+        user = AccountHolder.query.get_or_404(user_id)
         jti = get_jwt()["jti"]
         blocklist_connection.set(jti, "", ex=timedelta(hours=0.5))
-        return {"message": "Access token revoked"}, 201
+        return {"message": "User Logged Out"}, 201

@@ -12,8 +12,6 @@ if platform.system() == 'Linux':
 else:
     redis_db = config("connect.ini", "redis")
 
-print(redis_db)
-
 
 blocklist_connection = redis.Redis(
     host=redis_db["host"],
