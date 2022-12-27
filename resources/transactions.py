@@ -26,11 +26,11 @@ class AccountStatement(MethodView):
     @blp.response(200, AccountStatementSchema)
     def get(self, statement_dates, account_id):
         account = Account.query.get_or_404(account_id)
-        if not "from_date" in statement_dates and not "to_date" in statement_dates:
+        if (not "from_date" in statement_dates or statement_dates["from_date"] == "") and (not "to_date" in statement_dates or statement_dates["to_date" == ""]):
             transactions = account.transactions.order_by(
                 Acc_Transaction.txn_date.desc(), Acc_Transaction.balance).all()
         else:
-            if not "to_date" in statement_dates:
+            if (not "to_date" in statement_dates or statement_dates["to_date" == ""]):
                 transactions = account.transactions.filter_by(
                     txn_date=statement_dates["from_date"]).all()
             else:

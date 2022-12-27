@@ -13,6 +13,8 @@ from flask_cors import CORS, cross_origin
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from redis_connect.redis_connection import blocklist_connection
+from datetime import timedelta
+from config import config
 
 from resources.dateformats import blp as DateFormatBlueprint
 from resources.usermanagement import blp as UsersBlueprint
@@ -29,9 +31,12 @@ def create_app():
 
     if platform.system() == 'Linux':
         app.config["DEBUG"] = True
+        key = os.getenv("SECRET_KEY")
     else:
         app.config["DEBUG"] = True
-    app.config["SECRET_KEY"] = "Secret"
+        secret_key = config(section="secret-key")
+        key = secret_key["key"]
+    app.config["SECRET_KEY"] = key
     app.config['SQLALCHEMY_DATABASE_URI'] = get_engine()[0]
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOADED_STATEMENT_DEST'] = os.path.join(
@@ -43,6 +48,9 @@ def create_app():
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.20.3/"
+    app.config["JWT_SECRET_KEY"] = key
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
     configure_uploads(app, docs)
 
