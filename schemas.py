@@ -61,13 +61,12 @@ class AccountTransactionsSchema(Schema):
     withdrawal_amt = fields.Float(dump_only=True)
     deposit_amt = fields.Float(dump_only=True)
     balance = fields.Float(required=True, dump_only=True)
-    account_no = fields.Str(dump_only=True)
-    acc_id = fields.Int(required=True, load_only=True)
     from_date = fields.DateTime(load_only=True)
     to_date = fields.DateTime(load_only=True)
 
 
 class AccountStatementSchema(AccountsSchema):
+    account_no = fields.Str(dump_only=True)
     transactions = fields.List(fields.Nested(
         AccountTransactionsSchema()), dump_only=True)
 

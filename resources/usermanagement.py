@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from schemas import UserRegistration, UserLogin
 from flask_cors import cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_jwt_identity, verify_jwt_in_request
 from redis_connect.redis_connection import blocklist_connection
 from datetime import timedelta
 
@@ -54,10 +54,11 @@ class Login(MethodView):
 @blp.route("/userlogout")
 class Logout(MethodView):
     @cross_origin()
-    @jwt_required()
     def delete(self):
+        if not verify_jwt_in_request():
+            abort(404, message="Missing JWT")
         user_id = get_jwt_identity()
         user = AccountHolder.query.get_or_404(user_id)
         jti = get_jwt()["jti"]
         blocklist_connection.set(jti, "", ex=timedelta(hours=0.5))
-        return {"message": "User Logged Out", "ok":True}, 201
+        return {"message": "User Logged Out", "ok": True}, 201
