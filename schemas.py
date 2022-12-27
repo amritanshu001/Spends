@@ -61,8 +61,11 @@ class AccountTransactionsSchema(Schema):
     withdrawal_amt = fields.Float(dump_only=True)
     deposit_amt = fields.Float(dump_only=True)
     balance = fields.Float(required=True, dump_only=True)
-    from_date = fields.DateTime(load_only=True)
-    to_date = fields.DateTime(load_only=True)
+
+
+class AccountTransactionQuerySchema(Schema):
+    from_date = fields.Str()
+    to_date = fields.Str()
 
 
 class AccountStatementSchema(AccountsSchema):
