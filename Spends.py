@@ -30,13 +30,15 @@ def create_app():
     docs = UploadSet('statement', DOCUMENTS)
 
     if platform.system() == 'Linux':
-        app.config["DEBUG"] = True
+        app.config["DEBUG"] = False
         key = os.getenv("SECRET_KEY")
-        try:
+        if os.getenv("TOKEN_TIMEOUT_HOURS"):
             token_timeout = os.getenv("TOKEN_TIMEOUT_HOURS")
-            refresh_token_timeout = os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS")
-        except:
+        else:
             token_timeout = 1
+        if os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"):
+            refresh_token_timeout = os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS")
+        else:
             refresh_token_timeout = 1
 
     else:
