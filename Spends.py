@@ -33,11 +33,12 @@ def create_app():
         app.config["DEBUG"] = False
         key = os.getenv("SECRET_KEY")
         if os.getenv("TOKEN_TIMEOUT_HOURS"):
-            token_timeout = os.getenv("TOKEN_TIMEOUT_HOURS")
+            token_timeout = float(os.getenv("TOKEN_TIMEOUT_HOURS"))
         else:
             token_timeout = 1
         if os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"):
-            refresh_token_timeout = os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS")
+            refresh_token_timeout = float(
+                os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"))
         else:
             refresh_token_timeout = 1
 
@@ -49,8 +50,8 @@ def create_app():
         refresh_token_timeout = config(
             section="token-timeout")["refresh-token-days"]
         try:
-            token_timeout = int(token_timeout)
-            refresh_token_timeout = int(refresh_token_timeout)
+            token_timeout = float(token_timeout)
+            refresh_token_timeout = float(refresh_token_timeout)
         except:
             token_timeout = 1
             refresh_token_timeout = 1
