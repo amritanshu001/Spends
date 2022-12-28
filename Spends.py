@@ -32,10 +32,27 @@ def create_app():
     if platform.system() == 'Linux':
         app.config["DEBUG"] = True
         key = os.getenv("SECRET_KEY")
+        try:
+            token_timeout = os.getenv("TOKEN_TIMEOUT_HOURS")
+            refresh_token_timeout = os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS")
+        except:
+            token_timeout = 1
+            refresh_token_timeout = 1
+
     else:
         app.config["DEBUG"] = True
         secret_key = config(section="secret-key")
         key = secret_key["key"]
+        token_timeout = config(section="token-timeout")["fresh-token-hrs"]
+        refresh_token_timeout = config(
+            section="token-timeout")["refresh-token-days"]
+        try:
+            token_timeout = int(token_timeout)
+            refresh_token_timeout = int(refresh_token_timeout)
+        except:
+            token_timeout = 1
+            refresh_token_timeout = 1
+
     app.config["SECRET_KEY"] = key
     app.config['SQLALCHEMY_DATABASE_URI'] = get_engine()[0]
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,8 +66,10 @@ def create_app():
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.20.3/"
     app.config["JWT_SECRET_KEY"] = key
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
-    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
+        hours=token_timeout)
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
+        days=refresh_token_timeout)
 
     configure_uploads(app, docs)
 
