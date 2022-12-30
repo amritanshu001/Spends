@@ -89,7 +89,10 @@ def create_app():
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
         jti = jwt_payload["jti"]
-        token_in_redis = blocklist_connection.get(jti)
+        try:
+            token_in_redis = blocklist_connection.get(jti)
+        except ConnectionError:
+            token_in_redis = None
         return token_in_redis is not None
 
     def get_current_user():

@@ -48,10 +48,13 @@ class Register(MethodView):
         try:
             db.session.add(user)
             db.session.commit()
+        except IntegrityError as i:
+            db.session.rollback()
+            abort(403, message="User Already Registered")
         except SQLAlchemyError as err:
             db.session.rollback()
             # return {"msg": str(err)}
-            abort(404, message=str(err))
+            abort(403, message=str(err))
         else:
             return user
 
@@ -82,5 +85,9 @@ class Logout(MethodView):
         user_id = get_jwt_identity()
         user = AccountHolder.query.get_or_404(user_id)
         jti = get_jwt()["jti"]
-        blocklist_connection.set(jti, "", ex=timedelta(hours=0.5))
+        try:
+            blocklist_connection.set(
+                jti, "", ex=timedelta(hours=token_timeout))
+        except ConnectionError as c:
+            abort(404, message=str(c))
         return {"message": "User Logged Out", "ok": True}, 201

@@ -14,8 +14,6 @@ class UserRegistration(Schema):
     email_id = fields.Email(required=True, default_error_messages={
                             'invalid': 'Not a valid email address.'})
     password = fields.Str(load_only=True)
-    u_active = fields.Bool(dump_only=True)
-    admin = fields.Bool()
 
 
 class UserLogin(Schema):
@@ -85,7 +83,8 @@ class UpdateAccountSchema(Schema):
 
 
 class UploadTransactionsSchema(Schema):
-    account_id = fields.Int(load_only=True, required=True)
     upload_file = fields.Field(load_only=True, required=True)
+
+class UploadResponseSchema(Schema):
     pass_count = fields.Int(required=True, dump_only=True)
     fail_count = fields.Int(required=True, dump_only=True)
