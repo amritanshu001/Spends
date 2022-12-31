@@ -18,7 +18,8 @@ class AccountsManagement(MethodView):
     def get(self):
         id = get_jwt_identity()
         user = AccountHolder.query.get_or_404(id)
-        accounts = user.accounts.filter_by(active=True).all()
+        accounts = user.accounts.filter_by(
+            active=True).order_by(Account.account_id)
         return accounts
 
     @cross_origin()

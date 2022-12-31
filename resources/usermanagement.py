@@ -9,6 +9,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_j
 from redis_connect.redis_connection import blocklist_connection
 from datetime import timedelta
 from config import config
+from redis.exceptions import ConnectionError
 import platform
 import os
 
@@ -87,7 +88,7 @@ class Logout(MethodView):
         jti = get_jwt()["jti"]
         try:
             blocklist_connection.set(
-                jti, "", ex=timedelta(hours=token_timeout))
+                jti, platform.system(), ex=timedelta(hours=token_timeout))
         except ConnectionError as c:
             abort(404, message=str(c))
         return {"message": "User Logged Out", "ok": True}, 201

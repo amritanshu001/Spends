@@ -15,9 +15,9 @@ class Banks(MethodView):
     @jwt_required()
     @blp.response(200, BanksSchema(many=True))
     def get(self):
-        jwt = get_jwt()
-        if not jwt.get("admin"):
-            abort(401, message="Only Admin has access to this feature")
+        # jwt = get_jwt()
+        # if not jwt.get("admin"):
+        #     abort(401, message="Only Admin has access to this feature")
         banks = BankDetails.query.all()
 
         return banks

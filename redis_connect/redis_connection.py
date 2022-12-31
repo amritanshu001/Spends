@@ -2,6 +2,7 @@ import platform
 import os
 import redis
 from config import config
+from redis.exceptions import ConnectionError
 
 
 if platform.system() == 'Linux':
