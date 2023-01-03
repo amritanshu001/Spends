@@ -15,8 +15,8 @@ import os
 
 if platform.system() == 'Linux':
     try:
-        token_timeout = os.getenv("TOKEN_TIMEOUT_HOURS")
-        refresh_token_timeout = os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS")
+        token_timeout = int(os.getenv("TOKEN_TIMEOUT_HOURS"))
+        refresh_token_timeout = int(os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"))
     except:
         token_timeout = 1
         refresh_token_timeout = 1
