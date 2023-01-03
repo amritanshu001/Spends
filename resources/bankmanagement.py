@@ -70,6 +70,10 @@ class Bank(MethodView):
             abort(401, message="Only Admin has access to this feature")
         bank = BankDetails.query.get_or_404(bank_id)
 
+        account_exists = bank.accounts.first()
+        if account_exists:
+            abort(403, message="This bank has accounts assigned. Delete all accounts of this bank before deleting the bank")
+
         try:
             db.session.delete(bank)
             db.session.commit()
