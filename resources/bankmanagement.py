@@ -18,7 +18,7 @@ class Banks(MethodView):
         # jwt = get_jwt()
         # if not jwt.get("admin"):
         #     abort(401, message="Only Admin has access to this feature")
-        banks = BankDetails.query.all()
+        banks = BankDetails.query.order_by(BankDetails.bank_id).all()
 
         return banks
 
@@ -37,14 +37,11 @@ class Banks(MethodView):
             db.session.add(bank)
             db.session.commit()
         except IntegrityError as i:
-
             db.session.rollback()
-            print(dir(i._message))
-            abort(404, message=str(i))
+            abort(409, message="The Bank already exists!")
         except SQLAlchemyError as q:
             db.session.rollback()
-            print(dir(q))
-            abort(404, message=str(q))
+            abort(409, message=str(q))
         else:
             return bank
 
