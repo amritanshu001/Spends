@@ -109,7 +109,7 @@ class Acc_Transaction(db.Model):
     value_date = db.Column(db.DateTime, nullable=False)
     txn_date = db.Column(db.DateTime, nullable=False)
     txn_remarks = db.Column(db.Text(), nullable=False)
-    cheque_no = db.Column(db.String(20))
+    cheque_no = db.Column(db.Text())
     withdrawal_amt = db.Column(db.Float)
     deposit_amt = db.Column(db.Float)
     balance = db.Column(db.Float, nullable=False)
