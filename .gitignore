@@ -2,4 +2,5 @@ connect.ini
 temp/
 findlastrow.py
 createsql.sql
-spendsf-env/
+spends-env/
+*pycache*

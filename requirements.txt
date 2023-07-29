@@ -33,7 +33,7 @@ Flask-WTF==1.0.1
 fonttools==4.38.0
 gitdb==4.0.10
 GitPython==3.1.29
-greenlet==1.1.2
+greenlet
 gunicorn==20.1.0
 idna==3.4
 importlib-metadata==4.12.0
@@ -69,10 +69,10 @@ nbformat==5.7.0
 nest-asyncio==1.5.6
 notebook==6.5.2
 notebook_shim==0.2.2
-numpy==1.23.1
+numpy
 openpyxl==3.0.10
 packaging==21.3
-pandas==1.4.3
+pandas
 pandocfilters==1.5.0
 parso==0.8.3
 pexpect==4.8.0
@@ -83,7 +83,7 @@ plotly==5.11.0
 prometheus-client==0.15.0
 prompt-toolkit==3.0.33
 psutil==5.9.4
-psycopg2==2.9.3
+psycopg2
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pycparser==2.21
@@ -110,7 +110,6 @@ terminado==0.17.0
 threadpoolctl==3.1.0
 tinycss2==1.2.1
 tomli==2.0.1
-torch==1.13.0
 tornado==6.2
 traitlets==5.6.0
 typing_extensions==4.4.0
