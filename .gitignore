@@ -4,3 +4,4 @@ findlastrow.py
 createsql.sql
 spends-env/
 *pycache*
+.env

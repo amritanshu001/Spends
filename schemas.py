@@ -11,16 +11,34 @@ class DateFormatSchema(Schema):
 class UserRegistration(Schema):
     user_id = fields.Int(dump_only=True)
     user_name = fields.Str(required=True)
-    email_id = fields.Email(required=True, default_error_messages={
-                            'invalid': 'Not a valid email address.'})
+    email_id = fields.Email(
+        required=True, default_error_messages={"invalid": "Not a valid email address."}
+    )
     password = fields.Str(load_only=True)
+
+
+class PasswordResetRequest(Schema):
+    email_id = fields.Email(
+        required=True, default_error_messages={"invalid": "Not a valid email address."}
+    )
+    site_url = fields.Url(load_only=True)
+    userHash = fields.String(dump_only=True)
+
+
+class PasswordReset(Schema):
+    email_id = fields.Email(
+        required=True, default_error_messages={"invalid": "Not a valid email address."}
+    )
+    userHash = fields.String(load_only=True, required=True)
+    newPassword = fields.String(load_only=True)
 
 
 class UserLogin(Schema):
     user_id = fields.Int(dump_only=True)
     user_name = fields.Str(dump_only=True)
-    email_id = fields.Email(required=True, default_error_messages={
-                            'invalid': 'Not a valid email address.'})
+    email_id = fields.Email(
+        required=True, default_error_messages={"invalid": "Not a valid email address."}
+    )
     password = fields.Str(load_only=True)
     u_active = fields.Bool(dump_only=True)
     admin = fields.Bool()
@@ -68,13 +86,15 @@ class AccountTransactionQuerySchema(Schema):
 
 class AccountStatementSchema(AccountsSchema):
     account_no = fields.Str(dump_only=True)
-    transactions = fields.List(fields.Nested(
-        AccountTransactionsSchema()), dump_only=True)
+    transactions = fields.List(
+        fields.Nested(AccountTransactionsSchema()), dump_only=True
+    )
 
 
 class AccountUsersSchema(AccountsSchema):
-    users = fields.List(fields.Nested(UserRegistration()),
-                        required=True, dump_only=True)
+    users = fields.List(
+        fields.Nested(UserRegistration()), required=True, dump_only=True
+    )
 
 
 class UpdateAccountSchema(Schema):
@@ -84,6 +104,7 @@ class UpdateAccountSchema(Schema):
 
 class UploadTransactionsSchema(Schema):
     upload_file = fields.Field(load_only=True, required=True)
+
 
 class UploadResponseSchema(Schema):
     pass_count = fields.Int(required=True, dump_only=True)
