@@ -158,8 +158,8 @@ class PwdReset(MethodView):
     @blp.response(201, PasswordReset)
     def put(self, user_data):
         user = AccountHolder.query.filter(
-            AccountHolder.email_id == user_data["email_id"].lower()
-        ).first()
+            AccountHolder.reset_hash == user_data["userHash"]
+        ).one()
         if not user:
             abort(404, message="User not found")
         if user.reset_hash == None:
@@ -167,7 +167,7 @@ class PwdReset(MethodView):
         if user.reset_hash != user_data["userHash"]:
             abort(401, message="Hash does not match the user")
         if user.reset_expiry < datetime.datetime.now():
-            abort(410, message="Reset Link has expired")
+            abort(410, message="Reset Link has expired, send a new reset request")
         user.password = generate_password_hash(
             user_data["newPassword"], method="sha256"
         )

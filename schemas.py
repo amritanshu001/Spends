@@ -26,9 +26,6 @@ class PasswordResetRequest(Schema):
 
 
 class PasswordReset(Schema):
-    email_id = fields.Email(
-        required=True, default_error_messages={"invalid": "Not a valid email address."}
-    )
     userHash = fields.String(load_only=True, required=True)
     newPassword = fields.String(load_only=True)
 
