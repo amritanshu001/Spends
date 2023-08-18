@@ -126,7 +126,10 @@ class PwdReset(MethodView):
 
         hash = uuid.uuid4().hex
         user.reset_hash = hash
-        user.reset_expiry = datetime.datetime.now() + datetime.timedelta(seconds=6)
+        user.reset_expiry = datetime.datetime.now() + datetime.timedelta(
+            seconds=24 * 60 * 60
+        )
+        print(user)
         try:
             db.session.add(user)
             db.session.commit()
@@ -139,7 +142,7 @@ class PwdReset(MethodView):
             to_emails=email_data["email_id"],
             from_email=os.environ.get("MAIL_USERNAME"),
             html_content=render_template(
-                "password_reset.html", username=user.user_name, reset_link=reset_link
+                "password_reset.html", email_id=user.email_id, reset_link=reset_link
             ),
         )
         sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
@@ -159,7 +162,7 @@ class PwdReset(MethodView):
     def put(self, user_data):
         user = AccountHolder.query.filter(
             AccountHolder.reset_hash == user_data["userHash"]
-        ).one()
+        ).first_or_404()
         if not user:
             abort(404, message="User not found")
         if user.reset_hash == None:
@@ -179,4 +182,4 @@ class PwdReset(MethodView):
         except SQLAlchemyError as err:
             db.session.rollback()
             abort(403, message=str(err))
-        return {"email_id": user_data["email_id"]}
+        return {"email_id": user.email_id}

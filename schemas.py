@@ -28,6 +28,7 @@ class PasswordResetRequest(Schema):
 class PasswordReset(Schema):
     userHash = fields.String(load_only=True, required=True)
     newPassword = fields.String(load_only=True)
+    email_id = fields.Email(dump_only=True)
 
 
 class UserLogin(Schema):
