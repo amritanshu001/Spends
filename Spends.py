@@ -53,28 +53,18 @@ def create_app():
 
     if platform.system() == "Linux":
         app.config["DEBUG"] = False
-        key = os.getenv("SECRET_KEY")
-        if os.getenv("TOKEN_TIMEOUT_HOURS"):
-            token_timeout = float(os.getenv("TOKEN_TIMEOUT_HOURS"))
-        else:
-            token_timeout = 1
-        if os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"):
-            refresh_token_timeout = float(os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"))
-        else:
-            refresh_token_timeout = 1
-
     else:
         app.config["DEBUG"] = True
-        secret_key = config(section="secret-key")
-        key = secret_key["key"]
-        token_timeout = config(section="token-timeout")["fresh-token-hrs"]
-        refresh_token_timeout = config(section="token-timeout")["refresh-token-days"]
-        try:
-            token_timeout = float(token_timeout)
-            refresh_token_timeout = float(refresh_token_timeout)
-        except:
-            token_timeout = 1
-            refresh_token_timeout = 1
+
+    key = os.getenv("SECRET_KEY")
+    if os.getenv("TOKEN_TIMEOUT_HOURS"):
+        token_timeout = float(os.getenv("TOKEN_TIMEOUT_HOURS"))
+    else:
+        token_timeout = 1
+    if os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"):
+        refresh_token_timeout = float(os.getenv("REFRESH_TOKEN_TIMEOUT_DAYS"))
+    else:
+        refresh_token_timeout = 1
 
     app.config["SECRET_KEY"] = key
     app.config["SQLALCHEMY_DATABASE_URI"] = get_engine()[0]
@@ -94,21 +84,13 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = key
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=token_timeout)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=refresh_token_timeout)
-    # email config
-    app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
-    app.config["MAIL_PORT"] = os.getenv("MAIL_PORT")
-    app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
-    app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-
     # email Testing
     # app.config["MAIL_SERVER"] = "sandbox.smtp.mailtrap.io"
     # app.config["MAIL_PORT"] = 2525
     # app.config["MAIL_USERNAME"] = "553888c2751ed3"
     # app.config["MAIL_PASSWORD"] = "f4a5a3130dfd0d"
-    app.config["MAIL_USE_TLS"] = False
-    app.config["MAIL_USE_SSL"] = True
-
-    apikey = os.getenv("SENDGRID_API_KEY")
+    # app.config["MAIL_USE_TLS"] = False
+    # app.config["MAIL_USE_SSL"] = True
 
     configure_uploads(app, docs)
 

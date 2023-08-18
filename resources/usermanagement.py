@@ -129,7 +129,6 @@ class PwdReset(MethodView):
         user.reset_expiry = datetime.datetime.now() + datetime.timedelta(
             seconds=24 * 60 * 60
         )
-        print(user)
         try:
             db.session.add(user)
             db.session.commit()
