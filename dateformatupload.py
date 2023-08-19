@@ -3,18 +3,35 @@ import pandas as pd
 from sqlalchemy.exc import IntegrityError
 import os
 
-cur_path = os.path.dirname(os.path.realpath(__file__))
 
-os.chdir(cur_path)
+def uploadDateformat(file_name):
+    # cur_path = os.path.dirname(os.path.realpath(__file__))
 
-df = pd.read_excel('Dateformats.xlsx', engine='openpyxl')
+    # os.chdir(cur_path)
 
-for indx, format in df.iterrows():
-    db.session.add(DateFormat(**dict(format)))
-    try:
-        db.session.commit()
-    except IntegrityError as e:
-        db.session.rollback()
-        print ("Format {} already exists. Skipping...".format(format.date_format))
-    else:
-        print ("Format {} added successfully".format(format.date_format))
+    df = pd.read_excel(file_name, engine="openpyxl")
+    result = []
+    for indx, format in df.iterrows():
+        db.session.add(DateFormat(**dict(format)))
+        try:
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            print("Format {} already exists. Skipping...".format(format.date_format))
+            result.append(
+                {
+                    format.date_format: "Format {} already exists. Skipping...".format(
+                        format.date_format
+                    )
+                }
+            )
+        else:
+            print("Format {} added successfully".format(format.date_format))
+            result.append(
+                {
+                    format.date_format: "Format {} added successfully".format(
+                        format.date_format
+                    )
+                }
+            )
+    return result
