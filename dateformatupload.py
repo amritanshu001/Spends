@@ -17,7 +17,6 @@ def uploadDateformat(file_name):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            print("Format {} already exists. Skipping...".format(format.date_format))
             result.append(
                 {
                     format.date_format: "Format {} already exists. Skipping...".format(
@@ -26,7 +25,6 @@ def uploadDateformat(file_name):
                 }
             )
         else:
-            print("Format {} added successfully".format(format.date_format))
             result.append(
                 {
                     format.date_format: "Format {} added successfully".format(
