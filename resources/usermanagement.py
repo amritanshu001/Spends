@@ -19,9 +19,11 @@ from config import config
 from redis.exceptions import ConnectionError
 import platform
 import os
-from flask_mail import Message, Mail
+
+# from flask_mail import Message, Mail
 from flask import render_template
-from utils import mail
+
+# from utils import mail
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail as SendGridMail
 import datetime
@@ -90,6 +92,7 @@ class Login(MethodView):
             "access_token": access_token,
             "admin": user.admin,
             "expires_in": token_timeout * 3600,
+            "email_id": user.email_id,
         }
 
 
