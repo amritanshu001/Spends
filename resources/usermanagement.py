@@ -172,7 +172,16 @@ class PwdReset(MethodView):
         if user.reset_hash != user_data["userHash"]:
             abort(401, message="Hash does not match the user")
         if user.reset_expiry < datetime.datetime.now():
-            abort(410, message="Reset Link has expired, send a new reset request")
+            user.reset_hash = None
+            user.reset_expiry = None
+            try:
+                db.session.add(user)
+                db.session.commit()
+            except SQLAlchemyError as err:
+                db.session.rollback()
+                abort(403, message=str(err))
+            else:
+                abort(410, message="Reset Link has expired, send a new reset request")
         user.password = generate_password_hash(
             user_data["newPassword"], method="sha256"
         )
