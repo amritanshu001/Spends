@@ -5,3 +5,4 @@ createsql.sql
 *env/
 *pycache*
 .env
+.vscode/

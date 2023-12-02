@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy as sql
+from sqlalchemy.sql import func
 from sqlalchemy import ForeignKey
 from databaseconnect import get_engine
 from datetime import datetime
@@ -33,6 +34,8 @@ class BankDetails(db.Model):
     crdt_amt_col = db.Column(db.Integer)
     bal_col = db.Column(db.Integer)
     date_id = db.Column(db.Integer, db.ForeignKey("dateformat.date_id"))
+    created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_on = db.Column(db.DateTime(timezone=True), onupdate=func.now())
 
     date = db.relationship("DateFormat", backref="bank_details")
 
@@ -51,6 +54,8 @@ class DateFormat(db.Model):
     date_format = db.Column(db.String(20), nullable=False, unique=True)
     desc = db.Column(db.String(200), nullable=False)
     py_date = db.Column(db.String(20), nullable=False)
+    created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_on = db.Column(db.DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
         return f"<Date Format {self.date_format}"
@@ -79,6 +84,8 @@ class AccountHolder(db.Model):
     admin = db.Column(db.Boolean, default=False)
     reset_hash = db.Column(db.String(200))
     reset_expiry = db.Column(db.DateTime)
+    created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_on = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     # m:n relationships
     accounts = db.relationship(
         "Account", secondary=account_users, back_populates="users", lazy="dynamic"
@@ -96,6 +103,8 @@ class Account(db.Model):
     account_no = db.Column(db.String(20), nullable=False, unique=True)
     active = db.Column(db.Boolean, default=True)
     joint = db.Column(db.Boolean, default=False)
+    created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    updated_on = db.Column(db.DateTime(timezone=True), onupdate=func.now())
     # Foreign Key for 1:n relation
     bank = db.Column(db.Integer, db.ForeignKey("bank_details.bank_id"), nullable=False)
     bank_dets = db.relationship("BankDetails", back_populates="accounts")
@@ -124,6 +133,7 @@ class Acc_Transaction(db.Model):
     withdrawal_amt = db.Column(db.Float)
     deposit_amt = db.Column(db.Float)
     balance = db.Column(db.Float, nullable=False)
+    created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
     # Foreign Key for 1:n relation
     acc_id = db.Column(db.Integer, db.ForeignKey("account.account_id"), nullable=False)
     account_dets = db.relationship("Account", back_populates="transactions")

@@ -69,7 +69,10 @@ class Bank(MethodView):
 
         account_exists = bank.accounts.first()
         if account_exists:
-            abort(403, message="This bank has accounts assigned. Delete all accounts of this bank before deleting the bank")
+            abort(
+                403,
+                message="This bank has accounts assigned. Delete all accounts of this bank before deleting the bank",
+            )
 
         try:
             db.session.delete(bank)
