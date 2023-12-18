@@ -1,8 +1,20 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from CreateTransactionModel import db, Account, Acc_Transaction, AccountHolder, BankDetails
+from CreateTransactionModel import (
+    db,
+    Account,
+    Acc_Transaction,
+    AccountHolder,
+    BankDetails,
+)
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from schemas import UploadTransactionsSchema, AccountStatementSchema, AccountTransactionsSchema, AccountTransactionQuerySchema, UploadResponseSchema
+from schemas import (
+    UploadTransactionsSchema,
+    AccountStatementSchema,
+    AccountTransactionsSchema,
+    AccountTransactionQuerySchema,
+    UploadResponseSchema,
+)
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from processfile import processfile
@@ -10,10 +22,11 @@ from flask_uploads import UploadSet, DOCUMENTS, UploadNotAllowed
 import os
 from flask import request
 
-blp = Blueprint("Account Transactions", __name__,
-                description="Manage Account Statements")
+blp = Blueprint(
+    "Account Transactions", __name__, description="Manage Account Statements"
+)
 
-docs = UploadSet('statement', DOCUMENTS)
+docs = UploadSet("statement", DOCUMENTS)
 
 
 @blp.route("/statement/<int:account_id>")
@@ -30,8 +43,7 @@ class AccountStatement(MethodView):
         except UploadNotAllowed:
             abort(400, message="Upload file in Microsoft Excel format only")
         else:
-            df = processfile(
-                docs.path(statement_file), account.bank)
+            df = processfile(docs.path(statement_file), account.bank)
             insert_suc = 0
             insert_fail = 0
             for indx, transaction in df.iterrows():
@@ -43,11 +55,21 @@ class AccountStatement(MethodView):
                 except IntegrityError as e:
                     db.session.rollback()
                     insert_fail += 1
-                    print("Transaction {} already exists. Skipping...".format(
-                        transaction['txn_remarks']))
+                    print(
+                        "Transaction {} already exists. Skipping...".format(
+                            transaction["txn_remarks"]
+                        )
+                    )
                 else:
                     insert_suc += 1
-            os.remove(docs.path(statement_file))
+            try:
+                os.remove(docs.path(statement_file))
+            except:
+                print(
+                    "Failed to delete the temp file from path {}".format(
+                        docs.path(statement_file)
+                    )
+                )
         return {"pass_count": insert_suc, "fail_count": insert_fail}
 
     @cross_origin()
@@ -56,21 +78,39 @@ class AccountStatement(MethodView):
     @blp.response(200, AccountStatementSchema)
     def get(self, statement_dates, account_id):
         account = Account.query.get_or_404(account_id)
-        if (not "from_date" in statement_dates or statement_dates["from_date"] == "") and (not "to_date" in statement_dates or statement_dates["to_date"] == ""):
+        if (
+            not "from_date" in statement_dates or statement_dates["from_date"] == ""
+        ) and (not "to_date" in statement_dates or statement_dates["to_date"] == ""):
             transactions = account.transactions.order_by(
-                Acc_Transaction.txn_date.desc(), Acc_Transaction.balance).all()
+                Acc_Transaction.txn_date.desc(), Acc_Transaction.balance
+            ).all()
         else:
-            if (not "to_date" in statement_dates or statement_dates["to_date"] == ""):
-                transactions = account.transactions.filter(
-                    Acc_Transaction.txn_date >= statement_dates["from_date"]).order_by(
-                    Acc_Transaction.txn_date.desc(), Acc_Transaction.balance).all()
+            if not "to_date" in statement_dates or statement_dates["to_date"] == "":
+                transactions = (
+                    account.transactions.filter(
+                        Acc_Transaction.txn_date >= statement_dates["from_date"]
+                    )
+                    .order_by(Acc_Transaction.txn_date.desc(), Acc_Transaction.balance)
+                    .all()
+                )
             else:
-                if (not "from_date" in statement_dates or statement_dates["from_date"] == ""):
-                    transactions = account.transactions.filter(
-                        Acc_Transaction.txn_date <= statement_dates["to_date"]).order_by(
-                        Acc_Transaction.txn_date.desc(), Acc_Transaction.balance).all()
+                if (
+                    not "from_date" in statement_dates
+                    or statement_dates["from_date"] == ""
+                ):
+                    transactions = (
+                        account.transactions.filter(
+                            Acc_Transaction.txn_date <= statement_dates["to_date"]
+                        )
+                        .order_by(
+                            Acc_Transaction.txn_date.desc(), Acc_Transaction.balance
+                        )
+                        .all()
+                    )
                 else:
-                    transactions = account.transactions.filter(Acc_Transaction.txn_date.between(
-                        statement_dates["from_date"], statement_dates["to_date"])).order_by(
-                        Acc_Transaction.txn_date.desc(), Acc_Transaction.balance)
+                    transactions = account.transactions.filter(
+                        Acc_Transaction.txn_date.between(
+                            statement_dates["from_date"], statement_dates["to_date"]
+                        )
+                    ).order_by(Acc_Transaction.txn_date.desc(), Acc_Transaction.balance)
         return {"account_no": account.account_no, "transactions": transactions}
