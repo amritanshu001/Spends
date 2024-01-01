@@ -113,7 +113,7 @@ class Account(db.Model):
         "AccountHolder",
         secondary=account_users,
         back_populates="accounts",
-        lazy="dynamic",
+        lazy="joined",
     )
     transactions = db.relationship(
         "Acc_Transaction", back_populates="account_dets", lazy="dynamic"
@@ -121,6 +121,9 @@ class Account(db.Model):
 
     def __repr__(self):
         return f"<Account {self.account_no}>"
+
+    def to_dict(self):
+        return {field.name: getattr(self, field.name) for field in self.__table__.c}
 
 
 class Acc_Transaction(db.Model):

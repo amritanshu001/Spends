@@ -66,6 +66,10 @@ class AccountsSchema(Schema):
     bank_dets = fields.Nested(BanksSchema(), required=True, dump_only=True)
 
 
+class InactiveAccountsSchema(AccountsSchema):
+    user_emails = fields.Str(required=True)
+
+
 class AccountTransactionsSchema(Schema):
     txn_id = fields.Int(dump_only=True)
     value_date = fields.DateTime(required=True, dump_only=True)

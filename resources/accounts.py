@@ -1,13 +1,18 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from CreateTransactionModel import db, Account, Acc_Transaction, AccountHolder, BankDetails
+from CreateTransactionModel import (
+    db,
+    Account,
+    Acc_Transaction,
+    AccountHolder,
+    BankDetails,
+)
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from schemas import AccountsSchema, UpdateAccountSchema
+from schemas import AccountsSchema, UpdateAccountSchema, InactiveAccountsSchema
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
-blp = Blueprint("Account Management", __name__,
-                description="Manage User Accounts")
+blp = Blueprint("Account Management", __name__, description="Manage User Accounts")
 
 
 @blp.route("/accounts")
@@ -18,8 +23,7 @@ class AccountsManagement(MethodView):
     def get(self):
         id = get_jwt_identity()
         user = AccountHolder.query.get_or_404(id)
-        accounts = user.accounts.filter_by(
-            active=True).order_by(Account.account_id)
+        accounts = user.accounts.filter_by(active=True).order_by(Account.account_id)
         return accounts
 
     @cross_origin()
@@ -29,9 +33,8 @@ class AccountsManagement(MethodView):
     def post(self, account_data):
         id = get_jwt_identity()
         user = AccountHolder.query.get_or_404(id)
-        bank = BankDetails.query.get_or_404(account_data['bank'])
-        account = Account.query.filter_by(
-            account_no=account_data["account_no"]).first()
+        bank = BankDetails.query.get_or_404(account_data["bank"])
+        account = Account.query.filter_by(account_no=account_data["account_no"]).first()
 
         if account:
             existing_user = account.users.filter_by(user_id=id).first()
@@ -110,3 +113,23 @@ class AccountManagement(MethodView):
             abort(400, message=str(q))
         else:
             return {"message": "Account deactivated"}, 201
+
+
+@blp.route("/admin/accounts")
+class AdminAccountManagement(MethodView):
+    @cross_origin()
+    @jwt_required()
+    @blp.response(200, AccountsSchema(many=True))
+    def get(self):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        inactive_accounts = Account.query.options().filter(Account.active == False)
+        for account in inactive_accounts.all():
+            print(account.to_dict())
+            users = account.users
+            holders = ""
+            for user in users:
+                holders = holders + user.email_id + ","
+            print(holders.rstrip(","))
+        return inactive_accounts
