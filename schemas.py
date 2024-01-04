@@ -68,6 +68,8 @@ class AccountsSchema(Schema):
 
 class InactiveAccountsSchema(AccountsSchema):
     user_emails = fields.Str(required=True)
+    created_on = fields.DateTime(dump_only=True)
+    updated_on = fields.DateTime(dump_only=True)
 
 
 class AccountTransactionsSchema(Schema):

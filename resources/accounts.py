@@ -8,6 +8,7 @@ from CreateTransactionModel import (
     BankDetails,
 )
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.orm import joinedload
 from schemas import AccountsSchema, UpdateAccountSchema, InactiveAccountsSchema
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
@@ -119,17 +120,30 @@ class AccountManagement(MethodView):
 class AdminAccountManagement(MethodView):
     @cross_origin()
     @jwt_required()
-    @blp.response(200, AccountsSchema(many=True))
+    @blp.response(200, InactiveAccountsSchema(many=True))
     def get(self):
         jwt = get_jwt()
         if not jwt.get("admin"):
             abort(401, message="Only Admin has access to this feature")
-        inactive_accounts = Account.query.options().filter(Account.active == False)
-        for account in inactive_accounts.all():
-            print(account.to_dict())
-            users = account.users
+        inactive_accounts = (
+            Account.query.options(joinedload("users"))
+            .filter(Account.active == False)
+            .all()
+        )
+        incative_list = []
+
+        for account in inactive_accounts:
+            output_acc = InactiveAccountsSchema()
+            output_acc.account_no = account.account_no
+            output_acc.active = account.active
+            output_acc.joint = account.joint
+            output_acc.bank = account.bank
+            output_acc.bank_dets = account.bank_dets
+            output_acc.created_on = account.created_on
+            output_acc.updated_on = account.updated_on
             holders = ""
-            for user in users:
+            for user in account.users:
                 holders = holders + user.email_id + ","
-            print(holders.rstrip(","))
-        return inactive_accounts
+            output_acc.user_emails = holders.rstrip(",")
+            incative_list.append(output_acc)
+        return incative_list
