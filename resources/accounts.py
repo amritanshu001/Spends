@@ -117,7 +117,7 @@ class AccountManagement(MethodView):
 
 
 @blp.route("/admin/accounts")
-class AdminAccountManagement(MethodView):
+class GetAdminAccounts(MethodView):
     @cross_origin()
     @jwt_required()
     @blp.response(200, InactiveAccountsSchema(many=True))
@@ -134,6 +134,7 @@ class AdminAccountManagement(MethodView):
 
         for account in inactive_accounts:
             output_acc = InactiveAccountsSchema()
+            output_acc.account_id = account.account_id
             output_acc.account_no = account.account_no
             output_acc.active = account.active
             output_acc.joint = account.joint
@@ -147,3 +148,44 @@ class AdminAccountManagement(MethodView):
             output_acc.user_emails = holders.rstrip(",")
             incative_list.append(output_acc)
         return incative_list
+
+
+@blp.route("/admin/accounts/<int:account_id>")
+class ManageAdminAccounts(MethodView):
+    @cross_origin()
+    @jwt_required()
+    def put(self, account_id):
+        print(f"Account Id from query : {account_id}")
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        account = Account.query.get_or_404(account_id)
+        if account.active == True:
+            abort(401, message="Account is already active")
+        account.active = True
+        try:
+            db.session.add(account)
+            db.session.commit()
+        except SQLAlchemyError as q:
+            db.session.rollback()
+            abort(400, message=str(q))
+        else:
+            return {"message": f"Account {account.account_no} reactivated"}, 201
+
+    @cross_origin()
+    @jwt_required()
+    def delete(self, account_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        account = Account.query.get_or_404(account_id)
+        if account.active == True:
+            abort(401, message="Cannot delete active account")
+        try:
+            db.session.delete(account)
+            db.session.commit()
+        except SQLAlchemyError as q:
+            db.session.rollback()
+            abort(400, message=str(q))
+        else:
+            return {"message": "Account deleted"}, 201
