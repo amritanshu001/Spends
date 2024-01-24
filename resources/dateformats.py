@@ -33,18 +33,40 @@ class DateFormats(MethodView):
         if not jwt.get("admin"):
             abort(401, message="Only Admin has access to this feature")
         dateformat = DateFormat.query.filter(
-            DateFormat.date_format == dateformatdata["date_format"]
+            DateFormat.py_date == dateformatdata["py_date"]
         ).first()
         if dateformat:
             abort(409, message="This date format already exists")
+
+        new_dateformat = DateFormat(**dateformatdata)
+        percent_count = new_dateformat.py_date.count("%")
+        year_count = new_dateformat.py_date.count("Y") + new_dateformat.py_date.count(
+            "y"
+        )
+        month_count = (
+            new_dateformat.py_date.count("b")
+            + new_dateformat.py_date.count("B")
+            + new_dateformat.py_date.count("m")
+        )
+        day_count = new_dateformat.py_date.count("d") + new_dateformat.py_date.count(
+            "D"
+        )
+        if (
+            percent_count != 3
+            or year_count != 1
+            or month_count != 1
+            or day_count != 1
+            or not new_dateformat.py_date.startswith("%")
+        ):
+            abort(405, message="The date is not in correct format")
         try:
-            db.session.add(dateformat)
+            db.session.add(new_dateformat)
             db.session.commit()
         except SQLAlchemyError as q:
             db.session.rollback()
             abort(400, message=str(q))
         else:
-            return dateformat
+            return new_dateformat
 
 
 @blp.route("/dateformats/<int:date_id>")
