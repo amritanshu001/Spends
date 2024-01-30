@@ -1,23 +1,16 @@
 import pandas as pd
 from CreateTransactionModel import (
-    Account,
     BankDetails,
-    Acc_Transaction,
-    AccountHolder,
     DateFormat,
 )
-import os
 import xlrd
 import openpyxl as xl
 import pathlib
 import numpy as np
+from tkinter.filedialog import askopenfilename
 
 
-def processfile(path, bankid, manualPath=False):
-    if manualPath:
-        path = r"C:\Users\amritanshu\Downloads\OpTransactionHistory21-03-2023.xls"
-        bankid = 1
-
+def processfile(path, bankid):
     extension = pathlib.Path(path).suffix
     if extension == ".xlsx":
         engine = "openpyxl"
@@ -93,14 +86,18 @@ def processfile(path, bankid, manualPath=False):
     sheets = pd.ExcelFile(path, engine=engine)
     for sheet in sheets.sheet_names:
         no_rows = sht_last_row[sheet] - bank_dets.start_row
-        df = pd.read_excel(
-            path,
-            sheet_name=sheet,
-            usecols=extract_cols,
-            skiprows=bank_dets.start_row - 2,
-            names=col_names,
-            nrows=no_rows + 1,
-        )
+        df = pd.DataFrame()
+        for col_name, col_pos in zip(col_names, extract_cols):
+            temp_df = pd.read_excel(
+                path,
+                sheet_name=sheet,
+                usecols=[col_pos],
+                skiprows=bank_dets.start_row - 2,
+                names=[col_name],
+                nrows=no_rows + 1,
+            )
+            df[col_name] = temp_df
+
         final_df = pd.concat([final_df, df])
     py_format = DateFormat.query.filter_by(date_id=bank_dets.date_id).first()
 
@@ -133,4 +130,11 @@ def processfile(path, bankid, manualPath=False):
 
 
 if __name__ == "__main__":
-    processfile(path="", bankid="", manualPath=True)
+    ipfilePath = askopenfilename(title="Select Input File")
+    bank_id = input("Enter Bank Id: ")
+    try:
+        int(bank_id)
+    except:
+        print("Please enter integers only")
+    else:
+        print(processfile(path=ipfilePath, bankid=bank_id))
