@@ -35,7 +35,7 @@ from flask_jwt_extended import JWTManager
 from redis_connect.redis_connection import blocklist_connection
 from datetime import timedelta
 from config import config
-from redis.exceptions import ConnectionError
+from redis.exceptions import ConnectionError, TimeoutError
 
 
 from resources.dateformats import blp as DateFormatBlueprint
@@ -111,6 +111,8 @@ def create_app():
         try:
             token_in_redis = blocklist_connection.get(jti)
         except ConnectionError:
+            token_in_redis = None
+        except TimeoutError:
             token_in_redis = None
         return token_in_redis is not None
 

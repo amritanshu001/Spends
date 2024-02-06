@@ -3,7 +3,13 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from CreateTransactionModel import db, AccountHolder
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from schemas import UserRegistration, UserLogin, PasswordReset, PasswordResetRequest
+from schemas import (
+    UserRegistration,
+    UserLogin,
+    PasswordReset,
+    PasswordResetRequest,
+    User,
+)
 from flask_cors import cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (
@@ -194,3 +200,16 @@ class PwdReset(MethodView):
             db.session.rollback()
             abort(403, message=str(err))
         return {"email_id": user.email_id}
+
+
+@blp.route("/admin/users")
+class Register(MethodView):
+    @cross_origin()
+    @jwt_required()
+    @blp.response(201, User(many=True))
+    def get(self):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        accounts = AccountHolder.query.all()
+        return accounts

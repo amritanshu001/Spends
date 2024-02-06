@@ -42,6 +42,13 @@ class UserLogin(Schema):
     admin = fields.Bool()
 
 
+class User(UserLogin):
+    reset_hash = fields.Str()
+    reset_expiry = fields.DateTime()
+    created_on = fields.DateTime()
+    updated_on = fields.DateTime()
+
+
 class BanksSchema(Schema):
     bank_id = fields.Int(dump_only=True)
     bank_name = fields.Str(required=True)

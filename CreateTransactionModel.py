@@ -86,6 +86,7 @@ class AccountHolder(db.Model):
     reset_expiry = db.Column(db.DateTime)
     created_on = db.Column(db.DateTime(timezone=True), server_default=func.now())
     updated_on = db.Column(db.DateTime(timezone=True), onupdate=func.now())
+    last_logged_in = db.Column(db.DateTime(timezone=True))
     # m:n relationships
     accounts = db.relationship(
         "Account", secondary=account_users, back_populates="users", lazy="dynamic"
