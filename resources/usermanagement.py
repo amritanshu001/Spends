@@ -9,6 +9,7 @@ from schemas import (
     PasswordReset,
     PasswordResetRequest,
     User,
+    UserRole,
 )
 from flask_cors import cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -89,17 +90,27 @@ class Login(MethodView):
         ).first()
         if not user:
             abort(404, message="User not found")
+        if not user.u_active:
+            abort(406, message="User has de-registered.")
 
         if not (check_password_hash(user.password, user_data["password"])):
             abort(404, message="Incorrect Password")
         access_token = create_access_token(identity=user.user_id)
-
-        return {
-            "access_token": access_token,
-            "admin": user.admin,
-            "expires_in": token_timeout * 3600,
-            "email_id": user.email_id,
-        }
+        user.last_logged_in = datetime.datetime.now()
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            # return {"msg": str(err)}
+            abort(403, message=str(err))
+        else:
+            return {
+                "access_token": access_token,
+                "admin": user.admin,
+                "expires_in": token_timeout * 3600,
+                "email_id": user.email_id,
+            }
 
 
 @blp.route("/userlogout")
@@ -118,6 +129,25 @@ class Logout(MethodView):
         except ConnectionError as c:
             abort(404, message=str(c))
         return {"message": "User Logged Out", "ok": True}, 201
+
+
+@blp.route("/de-register")
+class UnRegister(MethodView):
+    @cross_origin()
+    @jwt_required()
+    def delete(self):
+        user_id = get_jwt_identity()
+        user = AccountHolder.query.get_or_404(user_id)
+        if not user.u_active:
+            abort(406, message="User already deregistered.")
+        user.u_active = False
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return {"message": "User Deregistered Successfully"}, 201
 
 
 @blp.route("/pwd-reset-request")
@@ -174,7 +204,10 @@ class PwdReset(MethodView):
         if not user:
             abort(404, message="User not found")
         if user.reset_hash == None:
-            abort(400, message="Password Reset has not been requested for this user")
+            abort(
+                400,
+                message="Password Reset has not been requested for this user OR has been reset by admin",
+            )
         if user.reset_hash != user_data["userHash"]:
             abort(401, message="Hash does not match the user")
         if user.reset_expiry < datetime.datetime.now():
@@ -186,8 +219,8 @@ class PwdReset(MethodView):
             except SQLAlchemyError as err:
                 db.session.rollback()
                 abort(403, message=str(err))
-            else:
-                abort(410, message="Reset Link has expired, send a new reset request")
+        else:
+            abort(410, message="Reset Link has expired, send a new reset request")
         user.password = generate_password_hash(
             user_data["newPassword"], method="sha256"
         )
@@ -213,3 +246,58 @@ class Register(MethodView):
             abort(401, message="Only Admin has access to this feature")
         accounts = AccountHolder.query.all()
         return accounts
+
+
+@blp.route("/admin/user/<int:user_id>")
+class AdminUser(MethodView):
+    @cross_origin()
+    @jwt_required()
+    @blp.arguments(UserRole)
+    @blp.response(201, UserRole)
+    def put(self, user_data, user_id):
+        jwt = get_jwt()
+        cur_user_id = get_jwt_identity()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        user = AccountHolder.query.get(user_id)
+        if not user:
+            abort(404, message="No user with these details exist")
+
+        if not user.u_active:
+            abort(403, message="Cannot change role of inactive users")
+
+        if user_data["admin"] == False and cur_user_id == user_id:
+            abort(406, message="Cannot downgrade yourself from admin")
+        if user.admin == user_data["admin"]:
+            abort(406, message="User already has the requested role")
+
+        user.admin = user_data["admin"]
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return user
+
+    @cross_origin()
+    @jwt_required()
+    @blp.response(201, UserRole)
+    def patch(self, user_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        user = AccountHolder.query.get(user_id)
+        if not user:
+            abort(404, message="No user with these details exist")
+        if not user.reset_hash:
+            abort(406, message="There is no reset expiry date set")
+        user.reset_hash = None
+        user.reset_expiry = None
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return user
