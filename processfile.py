@@ -7,7 +7,8 @@ import xlrd
 import openpyxl as xl
 import pathlib
 import numpy as np
-from tkinter.filedialog import askopenfilename
+
+# from tkinter.filedialog import askopenfilename
 
 
 def processfile(path, bankid):
@@ -130,7 +131,7 @@ def processfile(path, bankid):
 
 
 if __name__ == "__main__":
-    ipfilePath = askopenfilename(title="Select Input File")
+    ipfilePath = input("Enter Input File Path: ")
     bank_id = input("Enter Bank Id: ")
     try:
         int(bank_id)
