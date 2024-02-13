@@ -161,6 +161,8 @@ class PwdReset(MethodView):
         ).first()
         if not user:
             abort(404, message="User not found")
+        if not user.u_active:
+            abort(406, message="User has de-registered")
         import uuid
 
         hash = uuid.uuid4().hex
@@ -200,13 +202,13 @@ class PwdReset(MethodView):
     def put(self, user_data):
         user = AccountHolder.query.filter(
             AccountHolder.reset_hash == user_data["userHash"]
-        ).first_or_404()
+        ).first()
         if not user:
-            abort(404, message="User not found")
+            abort(404, message="User not found OR expiry has been reset by admin")
         if user.reset_hash == None:
             abort(
                 400,
-                message="Password Reset has not been requested for this user OR has been reset by admin",
+                message="Password Reset has not been requested for this user ",
             )
         if user.reset_hash != user_data["userHash"]:
             abort(401, message="Hash does not match the user")
@@ -294,6 +296,47 @@ class AdminUser(MethodView):
             abort(406, message="There is no reset expiry date set")
         user.reset_hash = None
         user.reset_expiry = None
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return user
+
+    @cross_origin()
+    @jwt_required()
+    def delete(self, user_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        user = AccountHolder.query.get(user_id)
+        if not user:
+            abort(404, message="No user with these details exist")
+        if user.u_active:
+            abort(406, message="Active Users cannot be deleted")
+
+        try:
+            db.session.delete(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return {"message": "User deleted successfully"}, 201
+
+    @cross_origin()
+    @jwt_required()
+    @blp.response(201, UserRole)
+    def post(self, user_id):
+        jwt = get_jwt()
+        if not jwt.get("admin"):
+            abort(401, message="Only Admin has access to this feature")
+        user = AccountHolder.query.get(user_id)
+        if not user:
+            abort(404, message="No user with these details exist")
+        if user.u_active:
+            abort(406, message="User is already active")
+        user.u_active = True
         try:
             db.session.add(user)
             db.session.commit()
