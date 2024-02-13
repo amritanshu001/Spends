@@ -141,6 +141,7 @@ class UnRegister(MethodView):
         if not user.u_active:
             abort(406, message="User already deregistered.")
         user.u_active = False
+        user.admin = False
         try:
             db.session.add(user)
             db.session.commit()
@@ -337,6 +338,7 @@ class AdminUser(MethodView):
         if user.u_active:
             abort(406, message="User is already active")
         user.u_active = True
+        user.admin = False
         try:
             db.session.add(user)
             db.session.commit()
