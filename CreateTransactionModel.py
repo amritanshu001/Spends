@@ -1,23 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy as sql
 from sqlalchemy.sql import func
-from sqlalchemy import ForeignKey
 from databaseconnect import get_engine
-from datetime import datetime
-from sqlalchemy.exc import NoReferencedTableError
-from flask_migrate import Migrate
-
-app = Flask(__name__)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = get_engine()[0]
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = sql(app)
-migrate = Migrate()
-
-db.init_app(app)
-migrate.init_app(app, db)
-
+from utils import db
 
 class BankDetails(db.Model):
     __tablename__ = "bank_details"

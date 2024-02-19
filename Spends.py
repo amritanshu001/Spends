@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, g, redirect, url_for, session
 from CreateTransactionModel import (
-    db,
     BankDetails,
     Acc_Transaction,
     Account,
@@ -11,7 +10,6 @@ from databaseconnect import get_engine
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
-from sqlalchemy.exc import IntegrityError
 from processfile import processfile
 from Forms import (
     LoginForm,
@@ -36,6 +34,7 @@ from redis_connect.redis_connection import blocklist_connection
 from datetime import timedelta
 from config import config
 from redis.exceptions import ConnectionError, TimeoutError
+from utils import db, migrate
 
 
 from resources.dateformats import blp as DateFormatBlueprint
@@ -95,6 +94,7 @@ def create_app():
     configure_uploads(app, docs)
 
     db.init_app(app)
+    migrate.init_app(app=app, db=db)
     api = Api(app)
     cors = CORS(app)
     jwt = JWTManager(app)

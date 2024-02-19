@@ -6,6 +6,7 @@ from CreateTransactionModel import db, BankDetails, DateFormat
 from pathlib import Path
 from wtforms.fields import DateField
 
+
 class LoginForm(FlaskForm):
     email = EmailField("Email Id", validators=[InputRequired(message = "Email cannot be blank"),
             Length(min= 8, max= 200)
@@ -20,7 +21,7 @@ class DelBankData(Form):
     deactivate = BooleanField("Deactivate")
 
 class BankData(Form):
-    bankname = SelectField("Bank",coerce=int, choices=[("0","---")] + [(bank.bank_id, bank.bank_name) for bank in BankDetails.query.all()])
+    bankname = SelectField("Bank",coerce=int, choices=[("0","---")])
     accountno = StringField("Account No.",validators=[
         Length(max = 20)
     ])
@@ -68,11 +69,11 @@ class BankForm(FlaskForm):
     NumberRange(min = 1, message = "Cannot be less than 1")])
     bal_col = IntegerField("Balance [col]",validators=[InputRequired(),
     NumberRange(min = 1, message = "Cannot be less than 1")])
-    date_id = SelectField("Date Format",coerce = int, validators=[InputRequired()], choices=[('0','---')]+[(format.date_id, format.date_format) for format in DateFormat.query.all()])
+    date_id = SelectField("Date Format",coerce = int, validators=[InputRequired()], choices=[('0','---')])
     add_bank = SubmitField("Add Bank")
 
 class BankList(FlaskForm):
-    bankname = SelectField("Bank",coerce=int, choices=[("0","---")] + [(bank.bank_id, bank.bank_name) for bank in BankDetails.query.all()])
+    bankname = SelectField("Bank",coerce=int, choices=[("0","---")])
     refresh = SubmitField("Refresh")
 
 class Upload(FlaskForm):

@@ -64,7 +64,7 @@ class Register(MethodView):
     def post(self, user_data):
         user = AccountHolder(**user_data)
 
-        user.password = generate_password_hash(user_data["password"], method="sha256")
+        user.password = generate_password_hash(user_data["password"])
 
         try:
             db.session.add(user)
@@ -92,9 +92,11 @@ class Login(MethodView):
             abort(404, message="User not found")
         if not user.u_active:
             abort(406, message="User has de-registered.")
-
-        if not (check_password_hash(user.password, user_data["password"])):
-            abort(404, message="Incorrect Password")
+        try:
+            if not (check_password_hash(user.password, user_data["password"])):
+                abort(404, message="Incorrect Password")
+        except ValueError:
+            abort(404,message="Previous Encryption Method Depreciated!. We request you to please reset your password to a new one!")
         access_token = create_access_token(identity=user.user_id)
         user.last_logged_in = datetime.datetime.now()
         try:
@@ -225,7 +227,7 @@ class PwdReset(MethodView):
         else:
             abort(410, message="Reset Link has expired, send a new reset request")
         user.password = generate_password_hash(
-            user_data["newPassword"], method="sha256"
+            user_data["newPassword"]
         )
         user.reset_hash = None
         user.reset_expiry = None
