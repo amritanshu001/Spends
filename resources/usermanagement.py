@@ -215,7 +215,7 @@ class PwdReset(MethodView):
             )
         if user.reset_hash != user_data["userHash"]:
             abort(401, message="Hash does not match the user")
-        if user.reset_expiry < datetime.datetime.now():
+        if user.reset_expiry > datetime.datetime.now():
             user.reset_hash = None
             user.reset_expiry = None
             try:
