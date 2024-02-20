@@ -126,7 +126,7 @@ class GetAdminAccounts(MethodView):
         if not jwt.get("admin"):
             abort(401, message="Only Admin has access to this feature")
         inactive_accounts = (
-            Account.query.options(joinedload("users"))
+            Account.query.options(joinedload(Account.users))
             .filter(Account.active == False)
             .all()
         )
