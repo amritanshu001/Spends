@@ -24,6 +24,10 @@ class PasswordResetRequest(Schema):
     site_url = fields.Url(load_only=True)
     userHash = fields.String(dump_only=True)
 
+class ChangePassword(Schema):
+    old_password= fields.String(load_only=True)
+    new_password= fields.String(load_only=True)
+
 
 class PasswordReset(Schema):
     userHash = fields.String(load_only=True, required=True)

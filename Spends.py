@@ -83,6 +83,7 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = key
     app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=token_timeout)
     app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=refresh_token_timeout)
+    app.config["TESTING"] = os.getenv("ENVIRONMENT") == "TEST"
     # email Testing
     # app.config["MAIL_SERVER"] = "sandbox.smtp.mailtrap.io"
     # app.config["MAIL_PORT"] = 2525

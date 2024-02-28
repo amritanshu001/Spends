@@ -10,6 +10,7 @@ from schemas import (
     PasswordResetRequest,
     User,
     UserRole,
+    ChangePassword
 )
 from flask_cors import cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -151,6 +152,29 @@ class UnRegister(MethodView):
             db.session.rollback()
             abort(403, message=str(err))
         return {"message": "User Deregistered Successfully"}, 201
+    
+@blp.route("/change-password")
+class ChangePassword(MethodView):
+    @cross_origin()
+    @jwt_required()
+    @blp.arguments(ChangePassword)
+    @blp.response(201, UserLogin)
+    def patch(self, user_passwords):
+        user_id = get_jwt_identity()
+        user = AccountHolder.query.get_or_404(user_id)
+        print(user_passwords)
+        if not check_password_hash(user.password, user_passwords["old_password"]):
+            abort(401,message="Old Password does not match, in case you do not remember the password, please use reset password feature")
+        if check_password_hash(user.password, user_passwords["new_password"] ):
+            abort(401,message="Same as old password")
+        user.password = generate_password_hash(user_passwords["new_password"])
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except SQLAlchemyError as err:
+            db.session.rollback()
+            abort(403, message=str(err))
+        return user
 
 
 @blp.route("/pwd-reset-request")
@@ -167,7 +191,10 @@ class PwdReset(MethodView):
         if not user.u_active:
             abort(406, message="User has de-registered")
         import uuid
-
+        if os.getenv("ENVIRONMENT") == "TEST":
+            env_prefix = "TEST: "
+        else:
+            env_prefix = ""
         hash = uuid.uuid4().hex
         user.reset_hash = hash
         user.reset_expiry = datetime.datetime.now() + datetime.timedelta(
@@ -181,7 +208,7 @@ class PwdReset(MethodView):
             abort(403, message=str(err))
         reset_link = email_data["site_url"] + "/" + hash
         msg = SendGridMail(
-            subject="Request for Password reset: {}".format(user.user_name),
+            subject="{}Request for Password reset: {}".format(env_prefix,user.user_name),
             to_emails=email_data["email_id"],
             from_email=os.environ.get("MAIL_USERNAME"),
             html_content=render_template(
