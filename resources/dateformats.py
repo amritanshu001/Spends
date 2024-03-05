@@ -10,6 +10,8 @@ from flask_uploads import UploadSet, DOCUMENTS, UploadNotAllowed
 from dateformatupload import uploadDateformat
 import os
 import json
+from dotenv import load_dotenv
+load_dotenv()
 
 blp = Blueprint("DateFormats", __name__, description="Date Formats")
 

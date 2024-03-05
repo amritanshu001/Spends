@@ -27,6 +27,8 @@ from config import config
 from redis.exceptions import ConnectionError
 import platform
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # from flask_mail import Message, Mail
 from flask import render_template

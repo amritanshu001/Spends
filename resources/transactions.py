@@ -21,6 +21,8 @@ from processfile import processfile
 from flask_uploads import UploadSet, DOCUMENTS, UploadNotAllowed
 import os
 from flask import request
+from dotenv import load_dotenv
+load_dotenv()
 
 blp = Blueprint(
     "Account Transactions", __name__, description="Manage Account Statements"

@@ -12,6 +12,8 @@ from sqlalchemy.orm import joinedload
 from schemas import AccountsSchema, UpdateAccountSchema, InactiveAccountsSchema
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from dotenv import load_dotenv
+load_dotenv()
 
 blp = Blueprint("Account Management", __name__, description="Manage User Accounts")
 

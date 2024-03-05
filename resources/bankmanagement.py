@@ -5,6 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from schemas import BanksSchema
 from flask_cors import cross_origin
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from dotenv import load_dotenv
+load_dotenv()
 
 blp = Blueprint("Bank Management", __name__, description="List of Banks")
 
