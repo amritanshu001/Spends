@@ -45,33 +45,37 @@ class AccountStatement(MethodView):
         except UploadNotAllowed:
             abort(400, message="Upload file in Microsoft Excel format only")
         else:
-            df = processfile(docs.path(statement_file), account.bank)
-            insert_suc = 0
-            insert_fail = 0
-            for indx, transaction in df.iterrows():
-                acc_txn = Acc_Transaction(**dict(transaction))
-                acc_txn.acc_id = account.account_id
+            try:
+                df = processfile(docs.path(statement_file), account.bank)
+            except:
+                abort(406, message="Upload File processing failed, Please check your file format")
+            else:
+                insert_suc = 0
+                insert_fail = 0
+                for indx, transaction in df.iterrows():
+                    acc_txn = Acc_Transaction(**dict(transaction))
+                    acc_txn.acc_id = account.account_id
+                    try:
+                        db.session.add(acc_txn)
+                        db.session.commit()
+                    except IntegrityError as e:
+                        db.session.rollback()
+                        insert_fail += 1
+                        print(
+                            "Transaction {} already exists. Skipping...".format(
+                                transaction["txn_remarks"]
+                            )
+                        )
+                    else:
+                        insert_suc += 1
                 try:
-                    db.session.add(acc_txn)
-                    db.session.commit()
-                except IntegrityError as e:
-                    db.session.rollback()
-                    insert_fail += 1
+                    os.remove(docs.path(statement_file))
+                except:
                     print(
-                        "Transaction {} already exists. Skipping...".format(
-                            transaction["txn_remarks"]
+                        "Failed to delete the temp file from path {}".format(
+                            docs.path(statement_file)
                         )
                     )
-                else:
-                    insert_suc += 1
-            try:
-                os.remove(docs.path(statement_file))
-            except:
-                print(
-                    "Failed to delete the temp file from path {}".format(
-                        docs.path(statement_file)
-                    )
-                )
         return {"pass_count": insert_suc, "fail_count": insert_fail}
 
     @cross_origin()
