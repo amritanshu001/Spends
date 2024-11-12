@@ -10,7 +10,7 @@ from schemas import (
     PasswordResetRequest,
     User,
     UserRole,
-    ChangePassword
+    ChangePassword,
 )
 from flask_cors import cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -28,6 +28,7 @@ from redis.exceptions import ConnectionError
 import platform
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # from flask_mail import Message, Mail
@@ -68,6 +69,7 @@ class Register(MethodView):
         user = AccountHolder(**user_data)
 
         user.password = generate_password_hash(user_data["password"])
+        user.email_id = str(user_data["email_id"]).lower()
 
         try:
             db.session.add(user)
@@ -99,7 +101,10 @@ class Login(MethodView):
             if not (check_password_hash(user.password, user_data["password"])):
                 abort(404, message="Incorrect Password")
         except ValueError:
-            abort(404,message="Previous Encryption Method Depreciated!. We request you to please reset your password to a new one!")
+            abort(
+                404,
+                message="Previous Encryption Method Depreciated!. We request you to please reset your password to a new one!",
+            )
         access_token = create_access_token(identity=user.user_id)
         user.last_logged_in = datetime.datetime.now()
         try:
@@ -154,7 +159,8 @@ class UnRegister(MethodView):
             db.session.rollback()
             abort(403, message=str(err))
         return {"message": "User Deregistered Successfully"}, 201
-    
+
+
 @blp.route("/change-password")
 class ChangePassword(MethodView):
     @cross_origin()
@@ -166,9 +172,12 @@ class ChangePassword(MethodView):
         user = AccountHolder.query.get_or_404(user_id)
         print(user_passwords)
         if not check_password_hash(user.password, user_passwords["old_password"]):
-            abort(401,message="Old Password does not match, in case you do not remember the password, please use reset password feature")
-        if check_password_hash(user.password, user_passwords["new_password"] ):
-            abort(401,message="Same as old password")
+            abort(
+                401,
+                message="Old Password does not match, in case you do not remember the password, please use reset password feature",
+            )
+        if check_password_hash(user.password, user_passwords["new_password"]):
+            abort(401, message="Same as old password")
         user.password = generate_password_hash(user_passwords["new_password"])
         try:
             db.session.add(user)
@@ -193,6 +202,7 @@ class PwdReset(MethodView):
         if not user.u_active:
             abort(406, message="User has de-registered")
         import uuid
+
         if os.getenv("ENVIRONMENT") == "TEST":
             env_prefix = "TEST: "
         else:
@@ -210,7 +220,9 @@ class PwdReset(MethodView):
             abort(403, message=str(err))
         reset_link = email_data["site_url"] + "/" + hash
         msg = SendGridMail(
-            subject="{}Request for Password reset: {}".format(env_prefix,user.user_name),
+            subject="{}Request for Password reset: {}".format(
+                env_prefix, user.user_name
+            ),
             to_emails=email_data["email_id"],
             from_email=os.environ.get("MAIL_USERNAME"),
             html_content=render_template(
@@ -255,9 +267,7 @@ class PwdReset(MethodView):
                 abort(403, message=str(err))
         else:
             abort(410, message="Reset Link has expired, send a new reset request")
-        user.password = generate_password_hash(
-            user_data["newPassword"]
-        )
+        user.password = generate_password_hash(user_data["newPassword"])
         user.reset_hash = None
         user.reset_expiry = None
         try:
